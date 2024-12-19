@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lista de Combos</title>
+    <link rel="stylesheet" href="/static/planilla.css" />
+  </head>
+  <body>
+    <div>
+      <nav>
+        <ul>
+          <li><a href="/">Inicio</a></li>
+          <li><a href="/crear_combo">Crear Combo</a></li>
+        </ul>
+        <h1>Lista de Combos</h1>
+      </nav>
+    </div>
+
+    <!-- Mensaje de éxito (si existe) -->
+    {% if message %}
+    <div
+      id="messageContainer"
+      class="message-container"
+      style="display: none"
+    ></div>
+    {% endif %}
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre del Combo</th>
+          <th>Días</th>
+          <th>Descripción</th>
+          <th>Precio</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for combo in combos %}
+        <tr id="combo-{{ combo.id_plan }}">
+          <td>{{ combo.id_plan }}</td>
+          <td>{{ combo.nombre_plan }}</td>
+          <td>{{ combo.dias }}</td>
+          <td>{{ combo.descripcion }}</td>
+          <td>${{ combo.precio }}</td>
+          <td>
+            <button onclick="showDeleteForm('{{ combo.id_plan }}')">
+              Eliminar
+            </button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Formulario de eliminación -->
+    <div id="deleteForm" style="display: none">
+      <h2>Eliminar Combo</h2>
+      <form id="deleteComboForm" method="post">
+        <input type="hidden" id="deleteId" name="id" />
+        <p class="parrafo">¿Estás seguro de que deseas eliminar este combo?</p>
+        <div class="botones-act-dele1">
+          <button type="button" onclick="eliminarCombo()">Eliminar</button>
+          <button class="pis" type="button" onclick="hideDeleteForm()">
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      function showDeleteForm(id) {
+        document.getElementById("deleteId").value = id;
+        document.getElementById("deleteForm").style.display = "block";
+      }
+
+      function hideDeleteForm() {
+        document.getElementById("deleteForm").style.display = "none";
+      }
+
+      function eliminarCombo() {
+        const comboId = document.getElementById("deleteId").value;
+
+        fetch(`/planes/${comboId}/eliminar`, {
+          method: "POST", // Mantén POST aquí como en el backend
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Error al eliminar el combo");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            alert(data.message);
+            document.getElementById(`combo-${comboId}`).remove();
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            alert("Error al eliminar el combo: " + error.message);
+          })
+          .finally(() => {
+            hideDeleteForm();
+          });
+      }
+    </script>
+  </body>
+</html>

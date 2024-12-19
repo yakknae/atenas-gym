@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Atenas GYM</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  </head>
+  <body>
+    <header>
+      <h1>ATENAS GYM</h1>
+      <img
+        src="static/assets/atenas2.png"
+        alt="Logo Atenas Gym"
+        class="header-logo"
+      />
+    </header>
+    <main>
+      <div class="container">
+        <!-- Sección Socios -->
+        <div class="card">
+          <h2>Socios</h2>
+          <p>Gestiona los socios.</p>
+          <div class="button-group">
+            <a href="/crear_socio" class="button">Crear socio</a>
+            <a href="/read_socios" class="button">Ver socios</a>
+          </div>
+        </div>
+
+        <!-- Sección plan social -->
+        <div class="card">
+          <h2>Plan social</h2>
+          <p>Gestiona los planes sociales.</p>
+          <div class="button-group">
+            <a href="/crear_plan_social" class="button">Crear plan social</a>
+            <a href="/read_planes_sociales" class="button"
+              >Ver planes sociales</a
+            >
+          </div>
+        </div>
+
+        <!-- Sección combos de planes -->
+        <div class="card">
+          <h2>Combos de planes</h2>
+          <p>Gestiona los combos de planes.</p>
+          <div class="button-group">
+            <a href="/crear_plan" class="button">Crear combo</a>
+            <a href="/read_combos" class="button">Ver combos</a>
+          </div>
+        </div>
+
+        <!-- Planilla Asistencias -->
+        <div class="card">
+          <h2>Asistencias</h2>
+          <p>Gestiona las asistencias de los socios.</p>
+          <div class="button-group">
+            <a href="/asistencias" class="button">Planilla asistencias</a>
+          </div>
+        </div>
+      </div>
+      <div class="background-image"></div>
+    </main>
+    <footer>
+      <p>&copy; Atenas gym</p>
+    </footer>
+  </body>
+</html>

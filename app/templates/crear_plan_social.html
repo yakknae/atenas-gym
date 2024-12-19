@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Crear plan social</title>
+    <link rel="stylesheet" href="/static/crear.css" />
+  </head>
+  <body>
+    <div>
+      <nav>
+        <ul>
+          <li><a href="/">Inicio</a></li>
+          <li><a href="read_planes_sociales">Ver planes sociales</a></li>
+        </ul>
+        <h1>Cargar nuevo plan social</h1>
+      </nav>
+    </div>
+
+    <div class="form-container">
+      <form action="/crear_plan_social" method="post">
+        <div class="form-group">
+          <label for="nombre">Nombre:</label>
+          <input
+            type="text"
+            id="nombre_plan_social"
+            name="nombre_plan_social"
+            placeholder="nombre del plan social"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <button type="submit">Cargar Plan social</button>
+        </div>
+      </form>
+    </div>
+    <div class="background-image"></div>
+    <!-- Mensaje de éxito (si existe) -->
+    {% if message %}
+    <div class="message-container">
+      <p class="message">{{ message }}</p>
+    </div>
+    {% endif %}
+  </body>
+</html>

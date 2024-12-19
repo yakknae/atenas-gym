@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Crear Nuevo Socio</title>
+    <link rel="stylesheet" href="/static/crear.css" />
+    <style>
+      .form-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      form {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        width: 560px;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .form-group.full-width {
+        grid-column: span 2;
+      }
+
+      button {
+        grid-column: span 2;
+        width: 100%;
+        padding: 10px;
+        font-size: 1rem;
+      }
+
+      #id_plan,
+      #id_plan_social,
+      #genero {
+        background: #2a2a2a;
+        color: white;
+        border: 1px solid #444;
+        padding: 10px;
+        width: 100%;
+        border-radius: 40px;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <nav>
+        <ul>
+          <li><a href="/">Inicio</a></li>
+          <li><a href="/read_socios">Ver Socios</a></li>
+        </ul>
+        <h1>Registrar Nuevo Socio</h1>
+      </nav>
+    </div>
+
+    <div class="form-container">
+      <form id="socioForm" action="/crear_socio" method="post">
+        <div class="form-group">
+          <label for="nombre">Nombre:</label>
+          <input
+            type="text"
+            id="nombre"
+            name="nombre"
+            required
+            placeholder="Nombre"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="apellido">Apellido:</label>
+          <input
+            type="text"
+            id="apellido"
+            name="apellido"
+            required
+            placeholder="Apellido"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="dni">DNI:</label>
+          <input type="number" id="dni" name="dni" required placeholder="DNI" />
+        </div>
+
+        <div class="form-group">
+          <label for="fecha_nacimiento">Fecha de Nacimiento:</label>
+          <input
+            type="date"
+            id="fecha_nacimiento"
+            name="fecha_nacimiento"
+            required
+          />
+        </div>
+
+        <div class="form-group full-width">
+          <label for="genero">Género:</label>
+          <select id="genero" name="genero" required>
+            <option value="Hombre">Hombre</option>
+            <option value="Mujer">Mujer</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            required
+            placeholder="Correo Electrónico"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="telefono">Teléfono:</label>
+          <input
+            type="text"
+            id="telefono"
+            name="telefono"
+            required
+            placeholder="Teléfono"
+          />
+        </div>
+
+        <div class="form-group full-width">
+          <label for="direccion">Dirección:</label>
+          <input
+            type="text"
+            id="direccion"
+            name="direccion"
+            required
+            placeholder="Dirección"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="id_plan">Plan:</label>
+          <select id="id_plan" name="id_plan" required>
+            <option value="" disabled selected>Seleccionar plan</option>
+            {% for plan in planes %}
+            <option value="{{ plan.id_plan }}">{{ plan.nombre_plan }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="id_plan_social">Plan Social:</label>
+          <select id="id_plan_social" name="id_plan_social" required>
+            <option value="" disabled selected>Seleccionar plan social</option>
+            {% for plan_social in planes_sociales %}
+            <option value="{{ plan_social.id_plan_social }}">
+              {{ plan_social.nombre_plan_social }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <button type="submit" onclick="disableButton()">Registrar Socio</button>
+      </form>
+    </div>
+    <div class="background-image"></div>
+
+    <!-- Mensaje de éxito (si existe) -->
+    {% if message %}
+    <div class="message-container">
+      <p class="message">{{ message }}</p>
+    </div>
+    {% endif %}
+
+    <script>
+      function validarFormulario() {
+        const dni = document.getElementById("dni").value;
+        const email = document.getElementById("email").value;
+        const telefono = document.getElementById("telefono").value;
+        const direccion = document.getElementById("direccion").value;
+        const fechaNacimiento = new Date(
+          document.getElementById("fecha_nacimiento").value
+        );
+        const hoy = new Date();
+
+        // Validación del email
+        if (!email.includes("@") || !email.includes(".")) {
+          alert("Por favor, ingresa un email válido.");
+          return false;
+        }
+
+        // Validación del DNI
+        if (dni.length < 7 || dni.length > 8 || isNaN(dni)) {
+          alert("El DNI debe ser un número válido de 7 u 8 dígitos.");
+          return false;
+        }
+
+        // Validación del teléfono
+        if (telefono.length < 8 || telefono.length > 15 || isNaN(telefono)) {
+          alert(
+            "El número de teléfono debe ser válido y tener entre 8 y 15 dígitos."
+          );
+          return false;
+        }
+
+        // Validación de la dirección
+        if (direccion.length < 5) {
+          alert("La dirección debe contener al menos 5 caracteres.");
+          return false;
+        }
+
+        // Validación de la fecha de nacimiento
+        if (fechaNacimiento > hoy) {
+          alert("La fecha de nacimiento no puede ser una fecha futura.");
+          return false;
+        }
+
+        return true;
+      }
+
+      // Asociar la validación al formulario
+      document.getElementById("socioForm").onsubmit = function () {
+        return validarFormulario();
+      };
+
+      function disableButton() {
+        document.getElementById("submitButton").disabled = true;
+      }
+    </script>
+  </body>
+</html>

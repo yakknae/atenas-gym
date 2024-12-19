@@ -1,0 +1,263 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap");
+
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: #121212;
+  color: #e0f7fa;
+  margin: 0;
+  padding: 0;
+  cursor: url(/static/assets/cursorWhite.png) 16 16, auto !important;
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+}
+
+h1 {
+  margin: 0;
+  font-size: 2.5em;
+  font-weight: 600;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+th,
+td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #fc4500;
+}
+
+th {
+  background-color: #1e1e1e;
+  color: #e0f7fa;
+  font-weight: 600;
+}
+
+td {
+  color: #e0f7fa;
+  background-color: #2a2a2a;
+}
+
+table tr:hover {
+  background-color: #333;
+}
+
+button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  background-color: #474747;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+button:hover {
+  background-color: #9e2d04;
+  transform: scale(1.05);
+}
+
+.form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+}
+
+form {
+  padding: 12px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.form-group label {
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #e0f7fa;
+}
+label,
+h2,
+p {
+  user-select: none;
+}
+.form-group input {
+  padding: 10px;
+  border: 1px solid #00bcd4;
+  border-radius: 5px;
+  background-color: #85060d;
+  color: #e0f7fa;
+}
+
+h2 {
+  color: #e0f7fa;
+  text-align: center;
+  font-weight: 600;
+  margin: 0px;
+}
+
+.message-container {
+  background-color: rgba(19, 18, 18, 0.7);
+  padding: 12px;
+  text-align: center;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+
+.message {
+  background-color: #fc4500;
+  padding: 5px 10px;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  color: white;
+  width: 200px;
+  text-align: center;
+  display: inline;
+}
+
+p {
+  color: #e0f7fa;
+  font-size: 1em;
+}
+
+/* Estilos para el contenedor del formulario de actualización */
+#updateForm {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #222;
+  border: 1px solid #85060d;
+  border-radius: 10px;
+  padding: 20px;
+  width: 350px;
+  margin: auto;
+  position: relative;
+}
+
+/* Estilos para el contenedor del formulario de eliminación */
+#deleteForm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #222;
+  border: 1px solid #9e2d04;
+  border-radius: 10px;
+  padding: 20px;
+  width: 300px;
+  margin: auto;
+  position: relative;
+}
+
+/* Estilos para los grupos de formulario dentro de ambos formularios */
+#updateForm .form-group,
+#deleteForm .form-group {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+/* Estilos específicos para los inputs dentro de los grupos de formulario */
+#updateForm .form-group input,
+#deleteForm .form-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #9e2d04;
+  border-radius: 5px;
+  background-color: #333;
+  color: #fff;
+  box-sizing: border-box;
+}
+
+.acomodar-input {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.acomodar-input input {
+  padding: 8px;
+  border: 1px solid #9e2d04;
+  border-radius: 8px;
+  background-color: #2a2a2a;
+  color: #e0e0e0;
+  margin-bottom: 30px;
+}
+
+.botones-act-dele {
+  display: flex;
+  margin-left: 58px;
+}
+.botones-act-dele1 {
+  display: flex;
+  margin-left: 40px;
+}
+
+.pis {
+  margin-left: 10px;
+}
+
+.parrafo {
+  margin-left: 28px;
+}
+
+#descripcion {
+  background: #2a2a2a; /* Color de fondo */
+  color: white; /* Color del texto */
+  border: 1px solid #444; /* Opcional: color del borde */
+  padding: 10px; /* Opcional: espacio interno */
+  width: 100%; /* Opcional: ancho completo */
+  height: 100px; /* Opcional: altura */
+  resize: none; /* Opcional: desactivar el redimensionamiento */
+}
+
+nav {
+  background-color: #333;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: rgb(16 16 16 / 70%);
+}
+
+nav ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+nav ul li {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+nav ul li a {
+  padding: 8px 15px;
+  background-color: #191a19;
+  color: #ffffff;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+nav ul li a:hover {
+  background-color: #9e2d04;
+}
+
+nav h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  color: white;
+  flex-grow: 1;
+  text-align: center;
+  margin-right: 200px;
+}

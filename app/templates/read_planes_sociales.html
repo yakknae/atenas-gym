@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lista de Planes Sociales</title>
+    <link rel="stylesheet" href="/static/planilla.css" />
+  </head>
+  <body>
+    <div>
+      <nav>
+        <ul>
+          <li><a href="/">Inicio</a></li>
+          <li><a href="/crear_plan_social">Crear Plan Social</a></li>
+        </ul>
+        <h1>Lista de Planes Sociales</h1>
+      </nav>
+    </div>
+
+    <!-- Mensaje de éxito (si existe) -->
+    {% if message %}
+    <div
+      id="messageContainer"
+      class="message-container"
+      style="display: none"
+    ></div>
+    {% endif %}
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre del Plan Social</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for plan_social in planes_sociales %}
+        <tr id="plan-social-{{ plan_social.id }}">
+          <td>{{ plan_social.id_plan_social }}</td>
+          <td>{{ plan_social.nombre_plan_social }}</td>
+          <td>
+            <button
+              onclick="showDeleteForm('{{ plan_social.id_plan_social }}')"
+            >
+              Eliminar
+            </button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Formulario de eliminación -->
+    <div id="deleteForm" style="display: none">
+      <h2>Eliminar Plan Social</h2>
+      <form id="deletePlanSocialForm" method="post">
+        <input type="hidden" id="deleteId" name="id" />
+        <p class="parrafo">
+          ¿Estás seguro de que deseas eliminar este plan social?
+        </p>
+        <div class="botones-act-dele1">
+          <button type="button" onclick="eliminarPlanSocial()">Eliminar</button>
+          <button class="pis" type="button" onclick="hideDeleteForm()">
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      function showDeleteForm(id) {
+        document.getElementById("deleteId").value = id;
+        document.getElementById("deleteForm").style.display = "block";
+      }
+      function hideDeleteForm() {
+        document.getElementById("deleteForm").style.display = "none";
+      }
+
+      function eliminarPlanSocial() {
+        const planSocialId = document.getElementById("deleteId").value;
+        console.log(planSocialId); // Verificar que el ID se esté capturando correctamente
+
+        if (!planSocialId) {
+          alert("ID del plan social no encontrado.");
+          return; // No continuar si no se encuentra el ID
+        }
+
+        fetch(`/planes_sociales/${planSocialId}/eliminar`, {
+          method: "POST", // POST como en el backend
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Error al eliminar el plan social");
+            }
+            return response.json(); // Asegurarse de que la respuesta es JSON
+          })
+          .then((data) => {
+            alert(data.message); // Mostrar el mensaje que viene de la respuesta
+            const row = document.getElementById(`plan-social-${planSocialId}`);
+            if (row) {
+              row.remove(); // Eliminar la fila correspondiente solo si existe
+            } else {
+              console.error(
+                "No se encontró la fila con ID:",
+                `plan-social-${planSocialId}`
+              );
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            alert("Error al eliminar el plan social: " + error.message);
+          })
+          .finally(() => {
+            hideDeleteForm(); // Ocultar el formulario de eliminación
+          });
+      }
+    </script>
+  </body>
+</html>

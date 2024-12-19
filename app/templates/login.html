@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Iniciar Sesión</title>
+    <link rel="stylesheet" href="/static/login.css" />
+  </head>
+  <body>
+    <div class="form-container">
+      <form method="post" action="/login">
+        <h2>Inicio de Sesión</h2>
+        <div class="form-group">
+          <label for="name">Nombre de Usuario:</label>
+          <input type="text" id="name" name="name" required />
+        </div>
+        <div class="form-group">
+          <label for="contrasena">Contraseña</label>
+          <input type="password" id="password" name="password" required />
+        </div>
+        <button type="submit">Iniciar Sesión</button>
+      </form>
+    </div>
+    <!-- Mensaje de éxito (si existe) -->
+    {% if request.cookies.get("login_error") %}
+    <div class="message-container">
+      <p class="message">{{ request.cookies.get("login_error") }}</p>
+    </div>
+    {% endif %}
+  </body>
+</html>

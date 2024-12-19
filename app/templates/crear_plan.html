@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Crear nuevo plan</title>
+    <link rel="stylesheet" href="/static/crear.css" />
+  </head>
+  <body>
+    <div>
+      <nav>
+        <ul>
+          <li><a href="/">Inicio</a></li>
+          <li><a href="read_combos">Ver Planes</a></li>
+        </ul>
+        <h1>Cargar nuevo Plan</h1>
+      </nav>
+    </div>
+
+    <div class="form-container">
+      <form id="formPlan" action="/crear_plan" method="post">
+        <div class="form-group">
+          <label for="nombre_plan">Nombre del plan:</label>
+          <input
+            type="text"
+            id="nombre_plan"
+            name="nombre_plan"
+            required
+            placeholder="Nombre del plan"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="dias">Días:</label>
+          <input
+            type="number"
+            id="dias"
+            name="dias"
+            required
+            placeholder="Número de días"
+            min="1"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="descripcion">Descripción:</label>
+          <textarea
+            id="descripcion"
+            name="descripcion"
+            placeholder="Descripción del plan (opcional)"
+            rows="4"
+            cols="50"
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="precio">Precio:</label>
+          <input
+            type="number"
+            id="precio"
+            name="precio"
+            required
+            placeholder="Precio del plan"
+            step="0.01"
+          />
+        </div>
+
+        <div class="form-group">
+          <button type="submit">Cargar Plan</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="background-image"></div>
+
+    <!-- Mensaje de éxito (si existe) -->
+    {% if message %}
+    <div class="message-container">
+      <p class="message">{{ message }}</p>
+    </div>
+    {% endif %}
+    <script>
+      function validar() {
+        const dias = document.getElementById("dias").value;
+        const precio = document.getElementById("precio").value;
+        // Validación de dias
+        if (dias < 1 || dias > 7) {
+          alert("Ingresar una cantidad de dias valido.");
+          return false;
+        }
+        // Validación de precio
+        if (precio < 0) {
+          alert("Ingresar un precio valido.");
+          return false;
+        }
+        return true;
+      }
+      document.getElementById("formPlan").onsubmit = function () {
+        return validar();
+      };
+    </script>
+  </body>
+</html>

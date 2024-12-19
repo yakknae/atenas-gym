@@ -1,0 +1,255 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap");
+
+/* Reset general */
+* {
+  padding: 0;
+  box-sizing: border-box;
+  cursor: url(/static/assets/cursorWhite.png) 16 16, auto !important;
+}
+
+/* Fondo y estilo general */
+body,
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: #f8f8f8;
+  background-color: #333;
+  line-height: 1.6;
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+  color: white;
+}
+
+h1 {
+  font-size: 2rem;
+  margin: 0;
+}
+
+/* Estilos para la barra de navegación */
+nav {
+  background-color: rgb(16 16 16 / 70%);
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+nav ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+nav ul li {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+nav ul li a {
+  padding: 8px 15px;
+  background-color: #191a19;
+  color: #ffffff;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+nav ul li a:hover {
+  background-color: #fc4500;
+}
+
+nav h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  color: white;
+  flex-grow: 1;
+  text-align: center;
+  margin-right: 200px;
+}
+
+/* Contenedor del formulario */
+
+.form-container {
+  display: flex;
+  justify-content: center; /* Centra el contenido horizontalmente */
+  align-items: center; /* Centra el contenido verticalmente */
+  min-height: 80vh; /* Asegura que ocupe al menos el 80% de la altura de la pantalla */
+  padding-top: 20px; /* Agrega un espacio en la parte superior si es necesario */
+}
+
+form {
+  background-color: #1f1f1f;
+  border: 1px solid #999999;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 960px;
+  margin: 0 auto; /* Centra el formulario horizontalmente */
+  margin-top: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.form-group label {
+  font-weight: 500;
+  color: #e0e0e0;
+}
+
+.form-group input {
+  padding: 12px;
+  border: 1px solid #999999;
+  border-radius: 8px;
+  background-color: #2a2a2a;
+  color: #e0e0e0;
+}
+
+button {
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background-color: #fc4500;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #9e2d04;
+}
+
+/* Estilos para la tabla de asistencias */
+.table-container {
+  margin: 30px auto;
+  width: 80%;
+  max-width: 800px;
+}
+
+.table-container table {
+  width: 100%;
+  border-collapse: separate; /* Separación de las celdas */
+  border-spacing: 10px; /* Espacio entre las celdas */
+  margin-top: 20px;
+}
+
+.table-container th,
+.table-container td {
+  padding: 16px; /* Mayor espacio dentro de las celdas */
+  text-align: left;
+  border: 1px solid #ddd;
+  background-color: #1f1f1f; /* Fondo oscuro para celdas */
+  color: white; /* Color del texto */
+}
+
+.table-container th {
+  background-color: #3498db;
+}
+
+.table-container tr:nth-child(even) {
+  background-color: #333;
+}
+
+.table-container tr:hover {
+  background-color: #444;
+}
+
+.table-container td button {
+  padding: 5px 10px;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.table-container td button:hover {
+  background-color: #c0392b;
+}
+
+/* Estilos para el mensaje de éxito */
+.message-container {
+  background-color: rgba(19, 18, 18, 0.7);
+  padding: 12px;
+  text-align: center;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+
+.message {
+  background-color: #fc4500;
+  padding: 5px 10px;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  color: white;
+  width: 200px;
+  text-align: center;
+  display: inline;
+}
+
+label,
+h1 {
+  user-select: none;
+}
+
+#descripcion {
+  background: #2a2a2a; /* Color de fondo */
+  color: white; /* Color del texto */
+  border: 1px solid #444; /* Opcional: color del borde */
+  padding: 10px; /* Opcional: espacio interno */
+  width: 100%; /* Opcional: ancho completo */
+  height: 100px; /* Opcional: altura */
+  resize: none; /* Opcional: desactivar el redimensionamiento */
+}
+
+.background-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh; /* Se ajusta a la altura de la ventana */
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    url("assets/fondo.png");
+  background-size: cover;
+  background-position: center;
+  z-index: -10; /* Por debajo del contenido */
+}
+
+#year {
+  width: 100px;
+}
+
+#month {
+  width: 100px;
+}
+
+.background-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh; /* Se ajusta a la altura de la ventana */
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    url("assets/fondo.png");
+  background-size: cover;
+  background-position: center;
+  z-index: -10; /* Por debajo del contenido */
+}
+
+thead {
+  margin: none;
+}

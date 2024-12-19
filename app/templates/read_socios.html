@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lista de Socios</title>
+    <link rel="stylesheet" href="/static/planilla.css" />
+  </head>
+  <body>
+    <div>
+      <nav>
+        <ul>
+          <li><a href="/">Inicio</a></li>
+          <li><a href="/crear_socio">Crear Socio</a></li>
+        </ul>
+        <h1>Lista de Socios</h1>
+      </nav>
+    </div>
+
+    <!-- Mensaje de éxito (si existe) -->
+    {% if message %}
+    <div
+      id="messageContainer"
+      class="message-container"
+      style="display: none"
+    ></div>
+    {% endif %}
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Apellido</th>
+          <th>DNI</th>
+          <th>Fecha de Nacimiento</th>
+          <th>Género</th>
+          <th>Email</th>
+          <th>Teléfono</th>
+          <th>Dirección</th>
+          <th>Plan</th>
+          <th>Plan Social</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for socio in socios %}
+        <tr id="socio-{{ socio.id_socio }}">
+          <td>{{ socio.id_socio }}</td>
+          <td>{{ socio.nombre }}</td>
+          <td>{{ socio.apellido }}</td>
+          <td>{{ socio.dni }}</td>
+          <td>{{ socio.fecha_nacimiento }}</td>
+          <td>{{ socio.genero }}</td>
+          <td>{{ socio.email }}</td>
+          <td>{{ socio.telefono }}</td>
+          <td>{{ socio.direccion }}</td>
+          <td>{{ socio.plan.nombre_plan if socio.plan else 'Sin Plan' }}</td>
+          <td>
+            {{ socio.plan_social.nombre_plan_social if socio.plan_social else
+            'Sin Plan Social' }}
+          </td>
+          <td>
+            <button onclick="showDeleteForm('{{ socio.id_socio }}')">
+              Eliminar
+            </button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Fondo oscuro superpuesto -->
+    <div id="deleteOverlay" onclick="hideDeleteForm()"></div>
+
+    <!-- Formulario de eliminación -->
+    <div id="deleteForm">
+      <h2>Eliminar Plan Social</h2>
+      <form id="eliminarSocio" method="post">
+        <input type="hidden" id="deleteId" name="id" />
+        <p class="parrafo">
+          ¿Estás seguro de que deseas eliminar este plan social?
+        </p>
+        <div class="botones-act-dele1">
+          <button type="button" onclick="eliminarSocio()">Eliminar</button>
+          <button class="pis" type="button" onclick="hideDeleteForm()">
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      function showDeleteForm(id) {
+        document.getElementById("deleteId").value = id;
+        document.getElementById("deleteForm").style.display = "block";
+      }
+
+      function hideDeleteForm() {
+        document.getElementById("deleteForm").style.display = "none";
+      }
+
+      function eliminarSocio() {
+        const socioId = document.getElementById("deleteId").value;
+
+        fetch(`/socios/${socioId}/eliminar`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Error al eliminar el socio");
+            }
+            return response.text();
+          })
+          .then(() => {
+            document.getElementById(`socio-${socioId}`).remove();
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            alert("Error al eliminar el socio: " + error.message);
+          })
+          .finally(() => {
+            hideDeleteForm();
+          });
+      }
+    </script>
+  </body>
+</html>
