@@ -3,11 +3,11 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 from contextlib import contextmanager
 
 # Reemplaza estos valores con tus credenciales de MySQL
-MYSQL_USER = "root"
-MYSQL_PASSWORD = "xiNXfzidHSRzmTCVgsqoasOgSiKmdIml"
-MYSQL_HOST = "127.0.0.1"  # o la IP de tu servidor MySQL
-MYSQL_PORT = "3306" 
-MYSQL_DATABASE = "railway"
+MYSQL_USER = "Valen"
+MYSQL_PASSWORD = "123"
+MYSQL_HOST = "192.168.0.221"  # o la IP de tu servidor MySQL
+MYSQL_PORT = "3307" 
+MYSQL_DATABASE = "atenas"
 
 SQLALCHEMY_DATABASE_URL = f"mysql+mysqlconnector://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}"
 
