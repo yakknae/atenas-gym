@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Float, Date, Text, Boolean
+from sqlalchemy import Column, Integer, String, ForeignKey, Float, Date, Text, Boolean, Time
+from datetime import datetime
 from sqlalchemy.orm import relationship
 from .database import Base
 
@@ -49,7 +50,7 @@ class Asistencia(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     socio_id = Column(Integer, ForeignKey('socios.id_socio'), nullable=False)
     fecha = Column(Date, nullable=False)
-    asistio = Column(Boolean, default=False)  
+    hora = Column(Time, nullable=False)
 
     # Relaciones
     socio = relationship("Socio", back_populates="asistencias")

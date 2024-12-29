@@ -2,7 +2,10 @@ from sqlalchemy.orm import Session
 from app import models, schemas
 from datetime import date, timedelta
 from typing import Dict
-
+import logging
+from fastapi import Request
+from datetime import datetime
+from sqlalchemy import or_
 
 #=============================== S O C I O S ================================================
 def create_socio(db: Session, socio: schemas.SocioCreate):
@@ -112,72 +115,31 @@ def delete_plan(db: Session, plan_id: int):
 
 #=============================== A S I S T E N C I A S ================================================
 
-def registrar_asistencia(db: Session, asistencias: Dict[int, bool]):
-    """
-    Registra las asistencias en la base de datos.
-    :param asistencias: Diccionario {socio_id: asistencia (True/False)}
-    """
-    for socio_id, asistio in asistencias.items():
-        fecha_actual = date.today()
-        # Verificar si ya existe asistencia para este socio en la fecha actual
-        asistencia_existente = db.query(models.Asistencia).filter(
-            models.Asistencia.socio_id == socio_id,
-            models.Asistencia.fecha == fecha_actual
-        ).first()
+def create_asistencia(db: Session, asistencia: schemas.AsistenciaCreate):
+    try:
+        db_asistencia = models.Asistencia(
+            socio_id=asistencia.socio_id,
+            fecha=asistencia.fecha,
+            hora=asistencia.hora,
+        )
+        db.add(db_asistencia)
+        db.commit()
+        db.refresh(db_asistencia)
+        return db_asistencia
+    except Exception as e:
+        print(f"Error en el CRUD: {str(e)}")
+        raise e
 
-        if asistio and not asistencia_existente:
-            # Crear nueva asistencia
-            nueva_asistencia = models.Asistencia(socio_id=socio_id, fecha=fecha_actual)
-            db.add(nueva_asistencia)
-        elif not asistio and asistencia_existente:
-            # Eliminar asistencia si se desmarcó
-            db.delete(asistencia_existente)
+def get_all_asistencias(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Asistencia).offset(skip).limit(limit).all()
 
+def eliminar_asistencia(db: Session, asistencia_id: int):
+    asistencia = db.query(models.Asistencia).filter(models.Asistencia.id == asistencia_id).first()
+    if not asistencia:
+        return False
+    db.delete(asistencia)
     db.commit()
-    return {"message": "Asistencias registradas correctamente."}
-
-def obtener_asistencias_por_mes(db: Session, year: int, month: int):
-    socios = db.query(models.Socio).all()
-    resultado = []
-
-    # Obtener el primer día y el último día del mes
-    primer_dia = date(year, month, 1)
-    if month == 12:
-        ultimo_dia = date(year + 1, 1, 1) - timedelta(days=1)
-    else:
-        ultimo_dia = date(year, month + 1, 1) - timedelta(days=1)
-
-    for socio in socios:
-        asistencias = db.query(models.Asistencia).filter(
-            models.Asistencia.socio_id == socio.id_socio,
-            models.Asistencia.fecha >= primer_dia,
-            models.Asistencia.fecha <= ultimo_dia
-        ).all()
-        resultado.append({
-            "socio": socio.nombre,
-            "asistencias": [asistencia.fecha.day for asistencia in asistencias],
-        })
-
-    return resultado
-
-
-def guardar_asistencias(db: Session, asistencias: list[dict], year: int, month: int):
-    for asistencia in asistencias:
-        socio = db.query(models.Socio).filter(models.Socio.nombre == asistencia["socio"]).first()
-        if not socio:
-            continue
-
-        fecha = date(year, month, int(asistencia["dia"]))
-        # Cambiar `socio.id` a `socio.id_socio`
-        if not db.query(models.Asistencia).filter(
-            models.Asistencia.socio_id == socio.id_socio,
-            models.Asistencia.fecha == fecha
-        ).first():
-            nueva_asistencia = models.Asistencia(socio_id=socio.id_socio, fecha=fecha)
-            db.add(nueva_asistencia)
-
-    db.commit()
-    return {"message": "Asistencias guardadas correctamente"}
+    return True
 
 #=============================== L O G I N ================================================
 # Crear usuario
@@ -191,3 +153,50 @@ def create_login(db: Session, login_data: schemas.LoginCreate):
 # Obtener usuario por nombre
 def get_login_by_name(db: Session, name: str):
     return db.query(models.login).filter(models.login.name == name).first()
+
+def log_logout(db: Session, user_id: int):
+    logging.info(f"Usuario con ID {user_id} ha cerrado sesión.")
+    return True
+
+def check_authenticated(request: Request) -> bool:
+    """
+    Verifica si el usuario está autenticado mediante la cookie 'authenticated'.
+    """
+    return request.cookies.get("authenticated") == "true"
+
+
+
+#=============================== P R U E B A ================================================
+def get_all_socios(db: Session):
+    return db.query(models.Socio).all()
+
+def get_asistencias_by_date(db: Session, fecha: str):
+    return db.query(models.Asistencia).filter(models.Asistencia.fecha == fecha).all()
+
+def get_asistencias_by_socio(db: Session, socio: str):
+    return (
+        db.query(models.Asistencia)
+        .join(models.Socio)
+        .filter(or_(
+            models.Socio.nombre.ilike(f"%{socio}%"),
+            models.Socio.apellido.ilike(f"%{socio}%")
+        ))
+        .all()
+    )
+
+def update_asistencia(db: Session, asistencia_id: int, socio_id: int):
+    asistencia = db.query(models.Asistencia).filter(models.Asistencia.id == asistencia_id).first()
+    if not asistencia:
+        return {"status": "error", "message": "Asistencia no encontrada"}
+    asistencia.socio_id = socio_id
+    db.commit()
+    return {"status": "success", "message": "Asistencia actualizada"}
+
+
+def get_asistencias_by_socio(db: Session, socio: str):
+    try:
+        result = db.query(models.Asistencia).join(models.Socio).filter(models.Socio.nombre.like(f'%{socio}%')).all()
+        return result
+    except Exception as e:
+        print(f"Error al ejecutar la consulta: {e}")
+        return []

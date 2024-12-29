@@ -55,14 +55,35 @@
           <h2>Asistencias</h2>
           <p>Gestiona las asistencias de los socios.</p>
           <div class="button-group">
-            <a href="/asistencias" class="button">Planilla asistencias</a>
+            <a href="/crear_asistencia" class="button">Registrar asistencias</a>
+            <a href="/read_asistencias" class="button">Planilla asistencias</a>
           </div>
         </div>
       </div>
+      <!-- Botón de Cerrar Sesión -->
+      <form class="logout-button" action="/logout" method="get">
+        <a class="logout-tittle" href="/logout">Cerrar sesión</a>
+      </form>
+      <!-- BACKGROUND -->
       <div class="background-image"></div>
     </main>
     <footer>
       <p>&copy; Atenas gym</p>
     </footer>
+    <script>
+      function logout() {
+        fetch("/logout", {
+          method: "GET",
+        })
+          .then((response) => {
+            if (response.ok) {
+              window.location.href = "/login"; // Redirige al login
+            } else {
+              console.error("Error al cerrar sesión");
+            }
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+    </script>
   </body>
 </html>

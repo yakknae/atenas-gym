@@ -1,15 +1,13 @@
-from fastapi import APIRouter, Request, Form, Depends, HTTPException
+from fastapi import APIRouter, Request, Form, Depends, HTTPException, Response
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.orm import Session
 from app.database import SessionLocal
-from app import crud, schemas, models
+from app import crud, schemas
 from fastapi.templating import Jinja2Templates
 import logging
 from sqlalchemy.exc import IntegrityError
-from typing import Dict
-import json
-from datetime import date
-
+from fastapi import Query
+from typing import List
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -334,76 +332,89 @@ async def delete_plan(plan_id: int, db: Session = Depends(get_db)):
 
 
 #=============================== A S I S T E N C I A S ================================================
-@router.post("/registrar_asistencia", tags=["Asistencias"])
-async def registrar_asistencia(
-    asistencias: Dict[int, bool], 
+# Mostrar formulario para registrar asistencia
+@router.get("/crear_asistencia", response_class=HTMLResponse, tags=["Asistencias"])
+async def show_create_asistencia_form(request: Request, db: Session = Depends(get_db)):
+    socios = crud.get_all_socios(db)
+    return templates.TemplateResponse("crear_asistencia.html", {"request": request, "socios": socios})
+
+@router.post("/crear_asistencia", tags=["Asistencias"])
+async def create_asistencia(
+    asistencia: schemas.AsistenciaCreate,
     db: Session = Depends(get_db)
 ):
-    """
-    Registra asistencias para los socios.
-    :param asistencias: Diccionario {socio_id: asistencia (True/False)}
-    :param db: Sesión de la base de datos
-    """
     try:
-        result = crud.registrar_asistencia(db, asistencias)
-        return {"message": result["message"]}
+        # Llamar al CRUD para crear la asistencia en la base de datos
+        crud.create_asistencia(db, asistencia)
+        return {"message": "Asistencia registrada exitosamente."}
     except Exception as e:
-        return {"error": str(e)}
-
-@router.get("/asistencias", response_class=HTMLResponse, tags=["Asistencias"])
-async def mostrar_asistencias(
-    request: Request,
-    year: int = date.today().year,
-    month: int = date.today().month,
-    db: Session = Depends(get_db),
-):
-    datos = crud.obtener_asistencias_por_mes(db, year, month)
-    años = list(range(2020, 2031))
-    return templates.TemplateResponse(
-        "asistencias.html",
-        {
-            "request": request,
-            "datos": datos,
-            "selected_year": year,
-            "selected_month": month,
-            "años": años,
-        },
-    )
+        print(f"Error al registrar la asistencia: {str(e)}")  # Imprimir el error en los logs del servidor
+        raise HTTPException(status_code=400, detail=f"Error al registrar asistencia: {str(e)}")
 
 
-@router.post("/asistencias", response_class=HTMLResponse, tags=["Asistencias"])
-async def guardar_asistencias_endpoint(
-    request: Request,
-    year: int = Form(...),
-    month: int = Form(...),
-    asistencias: str = Form(...),  # JSON string enviado desde el formulario
-    db: Session = Depends(get_db)
-):
-    """
-    Guarda las asistencias enviadas desde un formulario.
-    :param year: Año de las asistencias.
-    :param month: Mes de las asistencias.
-    :param asistencias: Cadena JSON con los datos de las asistencias.
-    """
-    try:
-        # Parseo seguro del JSON
-        asistencias_lista = json.loads(asistencias)
-        crud.guardar_asistencias(db, asistencias_lista, year, month)
-        message = "Asistencias guardadas correctamente."
-    except json.JSONDecodeError:
-        message = "Error al decodificar las asistencias. Asegúrate de enviar un JSON válido."
-    except Exception as e:
-        message = f"Error al guardar asistencias: {str(e)}"
-
-    # Cargar los datos nuevamente después de intentar guardar
-    datos = crud.obtener_asistencias_por_mes(db, year, month)
-    return templates.TemplateResponse("asistencias.html", {
+# Leer todas las asistencias
+@router.get("/read_asistencias", response_class=HTMLResponse, tags=["Asistencias"])
+async def read_asistencias(request: Request, db: Session = Depends(get_db)):
+    asistencias = crud.get_all_asistencias(db)
+    return templates.TemplateResponse("read_asistencias.html", {
         "request": request,
-        "datos": datos,
-        "message": message,
-        "year": year,
-        "month": month,
+        "asistencias": asistencias
     })
+
+@router.get("/asistencias", response_model=List[schemas.Asistencia], tags=["Asistencias"])
+async def get_all_asistencias(db: Session = Depends(get_db)):
+    return crud.get_all_asistencias(db)
+
+# Eliminar una asistencia
+@router.post("/read_asistencias/{asistencia_id}/eliminar", tags=["Asistencias"])
+async def delete_asistencia(asistencia_id: int, db: Session = Depends(get_db)):
+    result = crud.delete_asistencia(db, asistencia_id)
+
+    if result["status"] == "error":
+        raise HTTPException(status_code=404, detail=result["message"])
+
+    return {"message": "Asistencia eliminada exitosamente"}
+
+@router.get("/read_asistencias/filtrar", response_class=HTMLResponse, tags=["Asistencias"])
+async def filter_asistencias(
+    request: Request,
+    fecha: str = Query(None),
+    db: Session = Depends(get_db)
+):
+    asistencias = crud.get_asistencias_by_date(db, fecha) if fecha else []
+    return templates.TemplateResponse("filter_asistencias.html", {
+        "request": request,
+        "asistencias": asistencias,
+        "fecha": fecha
+    })
+
+@router.get("/read_asistencias/informe", response_class=HTMLResponse, tags=["Asistencias"])
+async def informe_asistencias(
+    request: Request,
+    socio: str = Query(None),
+    db: Session = Depends(get_db)
+):
+    # Recuperamos las asistencias filtradas por socio si el parámetro 'socio' está presente
+    asistencias = crud.get_asistencias_by_socio(db, socio) if socio else []
+    
+    # Retornamos el archivo de plantilla correcto 'read_asistencias.html'
+    return templates.TemplateResponse("read_asistencias.html", {
+        "request": request,
+        "asistencias": asistencias,
+        "socio": socio
+    })
+
+@router.post("/read_asistencias/{asistencia_id}/actualizar", response_class=HTMLResponse, tags=["Asistencias"])
+async def update_asistencia(
+    request: Request,
+    asistencia_id: int,
+    socio_id: int = Form(...),
+    db: Session = Depends(get_db)
+):
+    result = crud.update_asistencia(db, asistencia_id, socio_id)
+    if result["status"] == "error":
+        raise HTTPException(status_code=404, detail=result["message"])
+    return {"message": "Asistencia actualizada exitosamente"}
 
 #=============================== L O G I N ================================================
 
@@ -430,4 +441,12 @@ def show_index(request: Request):
     if authenticated == "true":
         return templates.TemplateResponse("index.html", {"request": request})
     else:
-        return RedirectResponse(url="/")
+        return RedirectResponse(url="/login")
+    
+
+@router.get("/logout", tags=["auth"])
+def logout(response: Response):
+    response.delete_cookie("authenticated")
+    return RedirectResponse(url="/login")
+
+

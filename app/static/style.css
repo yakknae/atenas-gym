@@ -130,3 +130,29 @@ footer {
   background-position: center;
   z-index: -10; /* Por debajo del contenido*/
 }
+
+/* Estilo para el botón de cerrar sesión */
+.logout-button {
+  position: fixed;
+  bottom: 20px; /* Ajusta la distancia desde el fondo de la página */
+  left: 20px; /* Ajusta la distancia desde el borde izquierdo */
+  padding: 10px 20px;
+  background-color: #fc4500;
+  color: white;
+  font-size: 1rem;
+  border-radius: 25px;
+  text-decoration: none;
+  display: inline-block;
+  transition: background-color 0.3s ease;
+  text-decoration: none;
+  color: black;
+}
+
+.logout-tittle {
+  text-decoration: none;
+  color: black;
+}
+
+.logout-button:hover {
+  background-color: #ff5722;
+}

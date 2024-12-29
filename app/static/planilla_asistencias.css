@@ -1,0 +1,271 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap");
+
+/* Estilos generales */
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: #121212;
+  color: #e0f7fa;
+  margin: 0;
+  padding: 0;
+  cursor: url(/static/assets/cursorWhite.png) 16 16, auto !important;
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+  overflow-x: hidden;
+}
+
+h1 {
+  margin: 0;
+  font-size: 2.5em;
+  font-weight: 600;
+  text-align: center;
+  padding-left: 20px;
+}
+
+/* Estilos para la barra de navegación */
+nav {
+  background-color: rgb(16 16 16 / 70%);
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+nav ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+nav ul li {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+nav ul li a {
+  padding: 8px 15px;
+  background-color: #191a19;
+  color: #ffffff;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+nav ul li a:hover {
+  background-color: #9e2d04;
+}
+
+/* Estilos para los formularios y botones */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 20px;
+  align-items: center; /* Centrar los elementos dentro del formulario */
+}
+
+label {
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #e0f7fa;
+}
+
+/* Estilos generales de los botones */
+button {
+  padding: 10px 15px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  background-color: #474747;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  max-width: 250px; /* Limitar el ancho máximo del botón */
+  box-sizing: border-box; /* Asegurarse de que el tamaño del botón no se vea afectado por el padding */
+  margin: 5px auto; /* Centrar los botones dentro de su contenedor */
+  display: block; /* Asegurarse de que el botón no sea un elemento inline */
+}
+
+/* Efecto de hover para el botón */
+button:hover {
+  background-color: #9e2d04;
+  transform: scale(1.05); /* Cambiar ligeramente el tamaño */
+  overflow: hidden; /* Evitar desbordamientos */
+}
+
+/* Estilos para la tabla de asistencias */
+table {
+  width: 100%;
+  max-width: 900px;
+  margin: 20px auto;
+  border-collapse: collapse;
+  background-color: #1e1e1e;
+  border-radius: 8px;
+  overflow: hidden; /* Para asegurar que las celdas no sobresalgan */
+  margin-top: 120px;
+}
+
+th,
+td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #fc4500;
+}
+
+th {
+  background-color: #333;
+  color: #e0f7fa;
+  font-weight: 600;
+}
+
+td {
+  background-color: #2a2a2a;
+  color: #e0f7fa;
+}
+
+table tr:hover {
+  background-color: #333;
+}
+
+/* Contenedor de los formularios */
+.form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+form {
+  max-height: 300px; /* Establece una altura máxima */
+  overflow-y: auto; /* Permite el scroll si el contenido es más grande */
+  transition: max-height 0.3s ease-in-out; /* Transición suave */
+  padding: 10px;
+  border-radius: 5px;
+  background: #1e1e1e;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 500px;
+  height: 200px;
+  margin-left: 20px;
+  margin-top: 160px;
+}
+
+/* Mensajes de alerta */
+.message-container {
+  background-color: rgba(19, 18, 18, 0.7);
+  padding: 12px;
+  text-align: center;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+
+.message {
+  background-color: #fc4500;
+  padding: 5px 10px;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  color: white;
+  width: 200px;
+  text-align: center;
+  display: inline-block;
+}
+
+/* Estilos para el contenedor del formulario de actualización */
+#updateForm,
+#deleteForm {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #222;
+  border: 1px solid #85060d;
+  border-radius: 10px;
+  padding: 20px;
+  width: 350px;
+  margin: auto;
+  position: relative;
+}
+
+/* Grupos de formulario en updateForm y deleteForm */
+#updateForm .form-group,
+#deleteForm .form-group {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+#updateForm .form-group input,
+#deleteForm .form-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #9e2d04;
+  border-radius: 5px;
+  background-color: #333;
+  color: white;
+  box-sizing: border-box;
+}
+
+.acomodar-input input {
+  padding: 8px;
+  border: 1px solid #9e2d04;
+  border-radius: 8px;
+  background-color: #2a2a2a;
+  color: #e0e0e0;
+  margin-bottom: 30px;
+}
+
+/* Contenedores específicos */
+#descripcion {
+  background: #2a2a2a;
+  color: white;
+  border: 1px solid #444;
+  padding: 10px;
+  width: 100%;
+  height: 100px;
+  resize: none;
+  margin-bottom: 20px;
+}
+
+.pis {
+  margin-left: 10px;
+}
+
+.parrafo {
+  margin-left: 28px;
+}
+
+/* Estilos para el contenedor de los botones */
+#formButtons {
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+  margin: 20px;
+  position: absolute;
+  top: 100px;
+}
+
+#formButtons button {
+  padding: 10px 20px;
+  background-color: #474747;
+  color: #e0f7fa;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  width: 200px;
+}
+
+#formButtons button:hover {
+  background-color: #9e2d04;
+}
+
+input[type="text"],
+input[type="date"] {
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #fc4500;
+  border-radius: 5px;
+  background-color: #2a2a2a;
+  color: #fc4500;
+  width: 100%;
+  max-width: 300px;
+}

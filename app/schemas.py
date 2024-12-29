@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional
-from datetime import date
+from datetime import date,time
 
 #=============================== C O M B O S ================================================
 # Esquemas para ComboPlan
@@ -81,7 +81,7 @@ class Config:
 class AsistenciaBase(BaseModel):
     socio_id: int
     fecha: date
-    asistio: bool
+    hora: time 
 
 class AsistenciaCreate(AsistenciaBase):
     pass

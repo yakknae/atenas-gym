@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Planilla de Asistencias</title>
+    <link rel="stylesheet" href="/static/planilla_asistencias.css" />
+  </head>
+  <body>
+    <div>
+      <nav>
+        <ul>
+          <li><a href="/index">Inicio</a></li>
+          <li><a href="/crear_asistencia">Registrar Asistencia</a></li>
+        </ul>
+        <h1>Planilla de Asistencias</h1>
+      </nav>
+    </div>
+
+    <!-- Contenedor de los botones -->
+    <div id="formButtons">
+      <button onclick="toggleForm('searchForm')">Buscar Socio</button>
+      <button onclick="toggleForm('filterForm')">Filtrar Fecha</button>
+    </div>
+
+    <!-- Formulario de búsqueda -->
+    <div id="searchForm" class="form-container" style="display: none">
+      <form>
+        <div class="form-group">
+          <label for="socioName">Nombre del Socio</label>
+          <input type="text" id="socioName" name="socioName" placeholder="Ingrese el nombre" />
+        </div>
+        <button type="submit">Buscar</button>
+      </form>
+    </div>
+
+    <!-- Formulario de filtro por fecha -->
+    <div id="filterForm" class="form-container" style="display: none">
+      <form>
+        <div class="form-group">
+          <label for="filterDate">Fecha</label>
+          <input type="date" id="filterDate" name="filterDate" />
+        </div>
+        <button type="submit">Filtrar</button>
+      </form>
+    </div>
+
+    <!-- Tabla de asistencias -->
+    <table id="asistencias-form">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Apellido</th>
+          <th>Fecha</th>
+          <th>Hora</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for asistencia in asistencias %}
+        <tr id="asistencia-{{ asistencia.socio_id }}">
+          <td>{{ asistencia.socio_id }}</td>
+          <td>{{ asistencia.socio.nombre }}</td>
+          <td>{{ asistencia.socio.apellido }}</td>
+          <td>{{ asistencia.fecha }}</td>
+          <td>{{ asistencia.hora }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Mensaje de éxito (si existe) -->
+    {% if message %}
+    <div class="message-container">
+      <p class="message">{{ message }}</p>
+    </div>
+    {% endif %}
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        console.log("DOM completamente cargado");
+        // Función para cargar todas las asistencias al cargar la página
+        function cargarAsistencias() {
+          fetch("/asistencias")
+            .then((response) => response.json())
+            .then((data) => {
+              const tableBody = document.getElementById("asistencias-table");
+              tableBody.innerHTML = ""; // Limpiar tabla
+              data.forEach((asistencia) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+            <td>${asistencia.id || "No disponible"}</td>
+            <td>${asistencia.socio.nombre || "No disponible"}</td>
+            <td>${asistencia.socio.apellido || "No disponible"}</td>
+            <td>${asistencia.fecha || "No disponible"}</td>
+            <td>${asistencia.hora || "No disponible"}</td>
+          `;
+                tableBody.appendChild(row);
+              });
+            })
+            .catch((error) => console.error("Error al cargar asistencias:", error));
+        }
+        // Cargar asistencias al iniciar
+        cargarAsistencias();
+
+        window.toggleForm = function (formId) {
+          // Ocultar todos los formularios antes de mostrar el seleccionado
+          const allForms = document.querySelectorAll(".form-container");
+          allForms.forEach((form) => {
+            form.style.display = "none"; // Ocultar todos los formularios
+          });
+
+          // Mostrar el formulario seleccionado
+          const form = document.getElementById(formId);
+          if (form) {
+            form.style.display = "block"; // Mostrar el formulario
+          } else {
+            console.error(`Formulario con ID ${formId} no encontrado.`);
+          }
+        };
+
+        // Generar informe para un socio
+        document.getElementById("searchForm").addEventListener("submit", (event) => {
+          event.preventDefault(); // Evita la recarga de la página
+          const socio = document.getElementById("socioName").value;
+          if (!socio) {
+            alert("Por favor, ingrese un nombre o apellido para buscar.");
+            return;
+          }
+          fetch(`/read_asistencias/informe?socio=${socio}`)
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error("No se pudo generar el informe");
+              }
+              return response.text();
+            })
+            .then((html) => {
+              document.body.innerHTML = html; // Reemplaza el contenido con el informe
+            })
+            .catch((error) => console.error("Error al generar el informe:", error));
+        });
+
+        // Filtrar asistencias por fecha
+        document.getElementById("filterForm").addEventListener("submit", (event) => {
+          event.preventDefault(); // Evita la recarga de la página
+          const fecha = document.getElementById("filterDate").value;
+          if (!fecha) {
+            alert("Por favor, seleccione una fecha para filtrar.");
+            return;
+          }
+          fetch(`/read_asistencias/filtrar?fecha=${fecha}`)
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error("No se pudo filtrar las asistencias");
+              }
+              return response.text();
+            })
+            .then((html) => {
+              document.body.innerHTML = html; // Reemplaza el contenido con el filtro
+            })
+            .catch((error) => console.error("Error al filtrar asistencias:", error));
+        });
+      });
+    </script>
+  </body>
+</html>

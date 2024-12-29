@@ -9,6 +9,8 @@ from datetime import date
 from fastapi.responses import FileResponse
 from fastapi.responses import JSONResponse
 from app.endpoints import router
+from fastapi import APIRouter, Response
+from fastapi.responses import RedirectResponse
 
 
 #from app.endpoints import router as endpoints_router
@@ -52,6 +54,7 @@ async def read_root(request: Request):
 @app.get("/test")
 def test_endpoint():
     return {"message": "Server is working"}
+
 
 #============================ I C O N ======================================== 
 @app.get("/favicon.ico", include_in_schema=False)
