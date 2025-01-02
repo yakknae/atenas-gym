@@ -19,19 +19,15 @@
 
     <!-- Mensaje de éxito (si existe) -->
     {% if message %}
-    <div
-      id="messageContainer"
-      class="message-container"
-      style="display: none"
-    ></div>
+    <div id="messageContainer" class="message-container" style="display: none"></div>
     {% endif %}
 
     <table>
       <thead>
         <tr>
           <th>ID</th>
-          <th>Nombre</th>
-          <th>Apellido</th>
+          <th id="orden-tabla" data-sort="nombre" onclick="ordenarTabla('nombre')">Nombre</th>
+          <th id="orden-tabla" data-sort="apellido" onclick="ordenarTabla('apellido')">Apellido</th>
           <th>DNI</th>
           <th>Fecha de Nacimiento</th>
           <th>Género</th>
@@ -43,7 +39,7 @@
           <th>Acciones</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="socios-table-body">
         {% for socio in socios %}
         <tr id="socio-{{ socio.id_socio }}">
           <td>{{ socio.id_socio }}</td>
@@ -56,14 +52,9 @@
           <td>{{ socio.telefono }}</td>
           <td>{{ socio.direccion }}</td>
           <td>{{ socio.plan.nombre_plan if socio.plan else 'Sin Plan' }}</td>
+          <td>{{ socio.plan_social.nombre_plan_social if socio.plan_social else 'Sin Plan Social' }}</td>
           <td>
-            {{ socio.plan_social.nombre_plan_social if socio.plan_social else
-            'Sin Plan Social' }}
-          </td>
-          <td>
-            <button onclick="showDeleteForm('{{ socio.id_socio }}')">
-              Eliminar
-            </button>
+            <button onclick="showDeleteForm('{{ socio.id_socio }}')">Eliminar</button>
           </td>
         </tr>
         {% endfor %}
@@ -74,18 +65,14 @@
     <div id="deleteOverlay" onclick="hideDeleteForm()"></div>
 
     <!-- Formulario de eliminación -->
-    <div id="deleteForm">
+    <div id="deleteForm" style="display: none">
       <h2>Eliminar Plan Social</h2>
       <form id="eliminarSocio" method="post">
         <input type="hidden" id="deleteId" name="id" />
-        <p class="parrafo">
-          ¿Estás seguro de que deseas eliminar este plan social?
-        </p>
+        <p class="parrafo">¿Estás seguro de que deseas eliminar este plan social?</p>
         <div class="botones-act-dele1">
           <button type="button" onclick="eliminarSocio()">Eliminar</button>
-          <button class="pis" type="button" onclick="hideDeleteForm()">
-            Cancelar
-          </button>
+          <button class="pis" type="button" onclick="hideDeleteForm()">Cancelar</button>
         </div>
       </form>
     </div>
@@ -98,6 +85,35 @@
 
       function hideDeleteForm() {
         document.getElementById("deleteForm").style.display = "none";
+      }
+
+      function ordenarTabla(campo) {
+        const tbody = document.getElementById("socios-table-body");
+        const filas = Array.from(tbody.querySelectorAll("tr"));
+        const ordenAscendente = tbody.dataset.orden !== campo; // Alterna orden
+
+        // Seleccionar la columna correcta con base en 'campo'
+        let indexColumna = 0; // Default si campo no coincide
+        if (campo === "nombre") {
+          indexColumna = 2; // Columna "Nombre" está en la segunda posición
+        } else if (campo === "apellido") {
+          indexColumna = 3; // Columna "Apellido" está en la tercera posición
+        }
+
+        filas.sort((filaA, filaB) => {
+          const celdaA = filaA.querySelector(`td:nth-child(${indexColumna})`).textContent.trim().toLowerCase();
+          const celdaB = filaB.querySelector(`td:nth-child(${indexColumna})`).textContent.trim().toLowerCase();
+
+          if (celdaA < celdaB) return ordenAscendente ? -1 : 1;
+          if (celdaA > celdaB) return ordenAscendente ? 1 : -1;
+          return 0;
+        });
+
+        // Alternar orden y actualizar el atributo data-orden
+        tbody.dataset.orden = ordenAscendente ? campo : "";
+
+        // Remover y reinsertar filas ordenadas
+        filas.forEach((fila) => tbody.appendChild(fila));
       }
 
       function eliminarSocio() {

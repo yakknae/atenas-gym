@@ -4,7 +4,7 @@ from datetime import date, timedelta
 from typing import Dict
 import logging
 from fastapi import Request
-from datetime import datetime
+from datetime import datetime, time
 from sqlalchemy import or_
 
 #=============================== S O C I O S ================================================
@@ -38,13 +38,22 @@ def update_socio(db: Session, socio_id: int, socio_update: schemas.SocioUpdate):
 
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
-def delete_socio(db: Session, socio_id: int):
-    socio = get_socio(db, socio_id)
-    if socio:
+def delete_socio(db: Session, socio_id: int) -> dict:
+    try:
+        socio = db.query(models.Socio).filter(models.Socio.id_socio == socio_id).first()
+        if not socio:
+            print(f"Socio con ID {socio_id} no encontrado.")
+            return {"status": "error", "message": "Socio no encontrado"}
+        
+        print(f"Socio encontrado: {socio}")
         db.delete(socio)
         db.commit()
+        print(f"Socio con ID {socio_id} eliminado exitosamente.")
         return {"status": "success"}
-    return {"status": "error", "message": "Socio no encontrado"}
+    except Exception as e:
+        print(f"Error al eliminar el socio: {str(e)}")
+        db.rollback()
+        return {"status": "error", "message": f"Error al eliminar: {str(e)}"}
 
 
 #=============================== PLANES S O C I A L E S ================================================
@@ -116,19 +125,15 @@ def delete_plan(db: Session, plan_id: int):
 #=============================== A S I S T E N C I A S ================================================
 
 def create_asistencia(db: Session, asistencia: schemas.AsistenciaCreate):
-    try:
-        db_asistencia = models.Asistencia(
-            socio_id=asistencia.socio_id,
-            fecha=asistencia.fecha,
-            hora=asistencia.hora,
-        )
-        db.add(db_asistencia)
-        db.commit()
-        db.refresh(db_asistencia)
-        return db_asistencia
-    except Exception as e:
-        print(f"Error en el CRUD: {str(e)}")
-        raise e
+    db_asistencia = models.Asistencia(
+        socio_id=asistencia.socio_id,
+        fecha=asistencia.fecha,
+        hora=asistencia.hora
+    )
+    db.add(db_asistencia)
+    db.commit()
+    db.refresh(db_asistencia)
+    return db_asistencia
 
 def get_all_asistencias(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Asistencia).offset(skip).limit(limit).all()
@@ -200,3 +205,7 @@ def get_asistencias_by_socio(db: Session, socio: str):
     except Exception as e:
         print(f"Error al ejecutar la consulta: {e}")
         return []
+    
+def convert_to_string(hour: time):
+    return hour.strftime("%H:%M:%S") if hour else None    
+    

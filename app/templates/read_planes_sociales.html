@@ -19,11 +19,7 @@
 
     <!-- Mensaje de éxito (si existe) -->
     {% if message %}
-    <div
-      id="messageContainer"
-      class="message-container"
-      style="display: none"
-    ></div>
+    <div id="messageContainer" class="message-container" style="display: none"></div>
     {% endif %}
 
     <table>
@@ -40,11 +36,7 @@
           <td>{{ plan_social.id_plan_social }}</td>
           <td>{{ plan_social.nombre_plan_social }}</td>
           <td>
-            <button
-              onclick="showDeleteForm('{{ plan_social.id_plan_social }}')"
-            >
-              Eliminar
-            </button>
+            <button onclick="showDeleteForm('{{ plan_social.id_plan_social }}')">Eliminar</button>
           </td>
         </tr>
         {% endfor %}
@@ -56,14 +48,10 @@
       <h2>Eliminar Plan Social</h2>
       <form id="deletePlanSocialForm" method="post">
         <input type="hidden" id="deleteId" name="id" />
-        <p class="parrafo">
-          ¿Estás seguro de que deseas eliminar este plan social?
-        </p>
+        <p class="parrafo">¿Estás seguro de que deseas eliminar este plan social?</p>
         <div class="botones-act-dele1">
           <button type="button" onclick="eliminarPlanSocial()">Eliminar</button>
-          <button class="pis" type="button" onclick="hideDeleteForm()">
-            Cancelar
-          </button>
+          <button class="pis" type="button" onclick="hideDeleteForm()">Cancelar</button>
         </div>
       </form>
     </div>
@@ -79,12 +67,6 @@
 
       function eliminarPlanSocial() {
         const planSocialId = document.getElementById("deleteId").value;
-        console.log(planSocialId); // Verificar que el ID se esté capturando correctamente
-
-        if (!planSocialId) {
-          alert("ID del plan social no encontrado.");
-          return; // No continuar si no se encuentra el ID
-        }
 
         fetch(`/planes_sociales/${planSocialId}/eliminar`, {
           method: "POST", // POST como en el backend
@@ -100,14 +82,13 @@
           })
           .then((data) => {
             alert(data.message); // Mostrar el mensaje que viene de la respuesta
+
+            // Eliminar la fila de la tabla
             const row = document.getElementById(`plan-social-${planSocialId}`);
             if (row) {
               row.remove(); // Eliminar la fila correspondiente solo si existe
             } else {
-              console.error(
-                "No se encontró la fila con ID:",
-                `plan-social-${planSocialId}`
-              );
+              console.error("No se encontró la fila con ID:", `plan-social-${planSocialId}`);
             }
           })
           .catch((error) => {

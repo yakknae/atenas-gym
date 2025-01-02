@@ -43,15 +43,20 @@
 
         const socioId = document.getElementById("socio").value;
         const fecha = new Date().toISOString().split("T")[0]; // Fecha en formato YYYY-MM-DD
-        const hora = new Date().toLocaleTimeString("es-ES", {
-          hour12: false,
-        }); // Hora en formato HH:MM:SS
 
-        // Imprimir los datos enviados
+        // Obtener la hora en la zona horaria de Buenos Aires (America/Argentina/Buenos_Aires)
+        const options = {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false,
+        };
+        const hora = new Date().toLocaleTimeString("es-AR", options);
+
         console.log({
           socio_id: socioId,
           fecha: fecha,
-          hora: hora,
+          hora: hora, // Hora en formato HH:MM:SS
         });
 
         fetch("/crear_asistencia", {
@@ -62,7 +67,7 @@
           body: JSON.stringify({
             socio_id: parseInt(socioId, 10),
             fecha: fecha,
-            hora: hora,
+            hora: hora, // Enviamos la hora con la zona horaria de Buenos Aires
           }),
         })
           .then((response) => {

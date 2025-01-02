@@ -91,6 +91,7 @@ class AsistenciaUpdate(AsistenciaBase):
 
 class Asistencia(AsistenciaBase):
     id: int
+    socio: SocioBase
 
 
 class Config:

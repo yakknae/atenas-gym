@@ -19,7 +19,7 @@ h1 {
   font-size: 2.5em;
   font-weight: 600;
   text-align: center;
-  padding-left: 20px;
+  padding-left: 640px;
 }
 
 /* Estilos para la barra de navegación */
@@ -27,7 +27,7 @@ nav {
   background-color: rgb(16 16 16 / 70%);
   padding: 12px;
   display: flex;
-  justify-content: space-between;
+  justify-content: start;
   align-items: center;
 }
 
@@ -268,4 +268,9 @@ input[type="date"] {
   color: #fc4500;
   width: 100%;
   max-width: 300px;
+}
+
+#orden-tabla-nombre,
+#orden-tabla-apellido {
+  cursor: pointer;
 }

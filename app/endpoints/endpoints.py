@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request, Form, Depends, HTTPException, Response
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from sqlalchemy.orm import Session
 from app.database import SessionLocal
 from app import crud, schemas
@@ -8,6 +8,8 @@ import logging
 from sqlalchemy.exc import IntegrityError
 from fastapi import Query
 from typing import List
+from datetime import datetime
+
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -155,21 +157,17 @@ async def actualizar_socio(
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
 # Eliminar un socio (POST)
-@router.post("/socios/{socio_id}/eliminar", response_class=HTMLResponse, tags=["Socios"])
-async def delete_socio(request: Request, socio_id: int, db: Session = Depends(get_db)):  # Agrega 'request'
+@router.post("/socios/{socio_id}/eliminar", response_class=JSONResponse, tags=["Socios"])
+async def delete_socio(request: Request, socio_id: int, db: Session = Depends(get_db)):
     try:
+        # Llamada al método de CRUD para eliminar el socio
         result = crud.delete_socio(db, socio_id)
         if result.get("status") == "success":
-            message = "Socio eliminado exitosamente"
+            return {"success": True, "message": "Socio eliminado exitosamente"}
         else:
-            message = "Error al eliminar el socio"
+            return {"success": False, "message": "Error al eliminar el socio"}
     except Exception as e:
-        message = f"Error: {str(e)}"
-    
-    return templates.TemplateResponse("read_socios.html", {
-        "request": request, 
-        "message": message
-    })
+        return {"success": False, "message": f"Error: {str(e)}"}
 #=============================== PLANES S O C I A L E S ================================================
 
 # Mostrar formulario para crear un plan social
@@ -340,15 +338,25 @@ async def show_create_asistencia_form(request: Request, db: Session = Depends(ge
 
 @router.post("/crear_asistencia", tags=["Asistencias"])
 async def create_asistencia(
-    asistencia: schemas.AsistenciaCreate,
+    asistencia: schemas.AsistenciaBase,  # Pydantic model
     db: Session = Depends(get_db)
 ):
     try:
-        # Llamar al CRUD para crear la asistencia en la base de datos
+        # Verifica lo que recibe el backend
+        print(f"Hora recibida en backend: {asistencia.hora}")
+
+        # Convierte la hora si es un string
+        if isinstance(asistencia.hora, str):
+            asistencia.hora = datetime.strptime(asistencia.hora, "%H:%M:%S").time()
+
+        # Asegúrate de que la hora esté en formato time
+        print(f"Hora convertida: {asistencia.hora}")
+
+        # Crear la asistencia (puedes seguir con la lógica de base de datos aquí)
         crud.create_asistencia(db, asistencia)
         return {"message": "Asistencia registrada exitosamente."}
     except Exception as e:
-        print(f"Error al registrar la asistencia: {str(e)}")  # Imprimir el error en los logs del servidor
+        print(f"Error al registrar la asistencia: {str(e)}")
         raise HTTPException(status_code=400, detail=f"Error al registrar asistencia: {str(e)}")
 
 
@@ -382,10 +390,9 @@ async def filter_asistencias(
     db: Session = Depends(get_db)
 ):
     asistencias = crud.get_asistencias_by_date(db, fecha) if fecha else []
-    return templates.TemplateResponse("filter_asistencias.html", {
+    return templates.TemplateResponse("read_asistencias.html", {
         "request": request,
-        "asistencias": asistencias,
-        "fecha": fecha
+        "asistencias": asistencias
     })
 
 @router.get("/read_asistencias/informe", response_class=HTMLResponse, tags=["Asistencias"])

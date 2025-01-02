@@ -261,3 +261,7 @@ nav h1 {
   text-align: center;
   margin-right: 200px;
 }
+
+#orden-tabla {
+  cursor: pointer;
+}
