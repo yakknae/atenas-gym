@@ -53,6 +53,7 @@ class SocioBase(BaseModel):
     email: Optional[EmailStr]
     telefono: Optional[str]
     direccion: Optional[str]
+    fecha_ingreso: Optional[date]
     id_plan: Optional[int]
     id_plan_social: Optional[int]
 

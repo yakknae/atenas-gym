@@ -62,24 +62,12 @@
       <form id="socioForm" action="/crear_socio" method="post">
         <div class="form-group">
           <label for="nombre">Nombre:</label>
-          <input
-            type="text"
-            id="nombre"
-            name="nombre"
-            required
-            placeholder="Nombre"
-          />
+          <input type="text" id="nombre" name="nombre" required placeholder="Nombre" />
         </div>
 
         <div class="form-group">
           <label for="apellido">Apellido:</label>
-          <input
-            type="text"
-            id="apellido"
-            name="apellido"
-            required
-            placeholder="Apellido"
-          />
+          <input type="text" id="apellido" name="apellido" required placeholder="Apellido" />
         </div>
 
         <div class="form-group">
@@ -89,12 +77,7 @@
 
         <div class="form-group">
           <label for="fecha_nacimiento">Fecha de Nacimiento:</label>
-          <input
-            type="date"
-            id="fecha_nacimiento"
-            name="fecha_nacimiento"
-            required
-          />
+          <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required />
         </div>
 
         <div class="form-group full-width">
@@ -107,35 +90,22 @@
 
         <div class="form-group">
           <label for="email">Email:</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            required
-            placeholder="Correo Electrónico"
-          />
+          <input type="email" id="email" name="email" required placeholder="Correo Electrónico" />
         </div>
 
         <div class="form-group">
           <label for="telefono">Teléfono:</label>
-          <input
-            type="text"
-            id="telefono"
-            name="telefono"
-            required
-            placeholder="Teléfono"
-          />
+          <input type="text" id="telefono" name="telefono" required placeholder="Teléfono" />
         </div>
 
-        <div class="form-group full-width">
+        <div class="form-group">
           <label for="direccion">Dirección:</label>
-          <input
-            type="text"
-            id="direccion"
-            name="direccion"
-            required
-            placeholder="Dirección"
-          />
+          <input type="text" id="direccion" name="direccion" required placeholder="Dirección" />
+        </div>
+
+        <div class="form-group">
+          <label for="fecha_ingreso">Fecha de ingreso:</label>
+          <input type="date" id="fecha_ingreso" name="fecha_ingreso" required />
         </div>
 
         <div class="form-group">
@@ -153,9 +123,7 @@
           <select id="id_plan_social" name="id_plan_social" required>
             <option value="" disabled selected>Seleccionar plan social</option>
             {% for plan_social in planes_sociales %}
-            <option value="{{ plan_social.id_plan_social }}">
-              {{ plan_social.nombre_plan_social }}
-            </option>
+            <option value="{{ plan_social.id_plan_social }}">{{ plan_social.nombre_plan_social }}</option>
             {% endfor %}
           </select>
         </div>
@@ -178,9 +146,7 @@
         const email = document.getElementById("email").value;
         const telefono = document.getElementById("telefono").value;
         const direccion = document.getElementById("direccion").value;
-        const fechaNacimiento = new Date(
-          document.getElementById("fecha_nacimiento").value
-        );
+        const fechaNacimiento = new Date(document.getElementById("fecha_nacimiento").value);
         const hoy = new Date();
 
         // Validación del email
@@ -197,9 +163,7 @@
 
         // Validación del teléfono
         if (telefono.length < 8 || telefono.length > 15 || isNaN(telefono)) {
-          alert(
-            "El número de teléfono debe ser válido y tener entre 8 y 15 dígitos."
-          );
+          alert("El número de teléfono debe ser válido y tener entre 8 y 15 dígitos.");
           return false;
         }
 

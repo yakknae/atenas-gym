@@ -29,11 +29,12 @@
           <th id="orden-tabla" data-sort="nombre" onclick="ordenarTabla('nombre')">Nombre</th>
           <th id="orden-tabla" data-sort="apellido" onclick="ordenarTabla('apellido')">Apellido</th>
           <th>DNI</th>
-          <th>Fecha de Nacimiento</th>
+          <th>Fec. Nacimiento</th>
           <th>Género</th>
           <th>Email</th>
           <th>Teléfono</th>
           <th>Dirección</th>
+          <th>fec. ingreso</th>
           <th>Plan</th>
           <th>Plan Social</th>
           <th>Acciones</th>
@@ -51,6 +52,7 @@
           <td>{{ socio.email }}</td>
           <td>{{ socio.telefono }}</td>
           <td>{{ socio.direccion }}</td>
+          <td>{{ socio.fecha_ingreso }}</td>
           <td>{{ socio.plan.nombre_plan if socio.plan else 'Sin Plan' }}</td>
           <td>{{ socio.plan_social.nombre_plan_social if socio.plan_social else 'Sin Plan Social' }}</td>
           <td>

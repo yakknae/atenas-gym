@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ingresos Semanales</title>
+    <link rel="stylesheet" href="/static/planilla.css" />
+  </head>
+  <body>
+    <div>
+      <nav>
+        <ul>
+          <li><a href="/index">Inicio</a></li>
+          <li><a href="/crear_combo">Crear Combo</a></li>
+        </ul>
+        <h1>Lista de Combos</h1>
+      </nav>
+    </div>
+
+    <!-- Mensaje de éxito (si existe) -->
+    {% if message %}
+    <div id="messageContainer" class="message-container" style="display: none"></div>
+    {% endif %}
+
+    <table class="ingresos-table">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Apellido</th>
+          <th>Combo</th>
+          <th>Fec. cobro</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for socio in socios %}
+        <tr>
+          <td>{{ socio.nombre }}</td>
+          <td>{{ socio.apellido }}</td>
+          <td>{{ socio.combo}}</td>
+          <td>{{ socio.fecha_cobro }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </body>
+</html>

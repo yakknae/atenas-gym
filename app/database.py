@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
-from contextlib import contextmanager
+
 
 # Reemplaza estos valores con tus credenciales de MySQL
 MYSQL_USER = "Valen"

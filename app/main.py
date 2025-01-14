@@ -1,16 +1,11 @@
-from fastapi import FastAPI, Request, Form, Depends, HTTPException
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse , FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from sqlalchemy.orm import Session
 from .database import engine, SessionLocal
-from . import models, crud, schemas
-from datetime import date
-from fastapi.responses import FileResponse
-from fastapi.responses import JSONResponse
+from . import models
 from app.endpoints import router
-from fastapi import APIRouter, Response
-from fastapi.responses import RedirectResponse
+
 
 
 #from app.endpoints import router as endpoints_router

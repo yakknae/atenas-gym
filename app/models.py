@@ -1,5 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Float, Date, Text, Boolean, Time
-from datetime import datetime
+from sqlalchemy import Column, Integer, String, ForeignKey, Date, Text, Time
 from sqlalchemy.orm import relationship
 from .database import Base
 
@@ -36,6 +35,7 @@ class Socio(Base):
     email = Column(String(150))
     telefono = Column(String(20))
     direccion = Column(String(255))
+    fecha_ingreso = Column(Date)
     id_plan = Column(Integer, ForeignKey('planes.id_plan'))
     id_plan_social = Column(Integer, ForeignKey('planes_sociales.id_plan_social'))
 

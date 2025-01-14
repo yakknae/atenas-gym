@@ -8,7 +8,7 @@ import logging
 from sqlalchemy.exc import IntegrityError
 from fastapi import Query
 from typing import List
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 
@@ -31,7 +31,7 @@ def get_db():
 
 #=============================== S O C I O S ================================================
 # Mostrar formulario para crear socio
-@router.get("/crear_socio", response_class=HTMLResponse)
+@router.get("/crear_socio", response_class=HTMLResponse, tags=["Socios"])
 async def show_create_socio_form(request: Request, db: Session = Depends(get_db),message: str = None):
     # Obtener planes y planes sociales
     planes = crud.get_all_planes(db)
@@ -48,7 +48,7 @@ async def show_create_socio_form(request: Request, db: Session = Depends(get_db)
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
 # Crear un socio (POST)
-@router.post("/crear_socio", response_class=HTMLResponse)
+@router.post("/crear_socio", response_class=HTMLResponse, tags=["Socios"])
 async def create_socio(
     request: Request,
     nombre: str = Form(...),
@@ -59,6 +59,7 @@ async def create_socio(
     email: str = Form(None),
     telefono: str = Form(None),
     direccion: str = Form(None),
+    fecha_ingreso: str = Form(...),
     id_plan: int = Form(None),
     id_plan_social: int = Form(None),
     db: Session = Depends(get_db)
@@ -73,6 +74,7 @@ async def create_socio(
             email=email,
             telefono=telefono,
             direccion=direccion,
+            fecha_ingreso=fecha_ingreso,
             id_plan=id_plan,
             id_plan_social=id_plan_social,
         )
@@ -125,6 +127,7 @@ async def actualizar_socio(
     email: str = Form(None),
     telefono: str = Form(None),
     direccion: str = Form(None),
+    fecha_ingreso: str = Form(None),
     db: Session = Depends(get_db),
       
 ):
@@ -140,7 +143,8 @@ async def actualizar_socio(
                 genero=genero,
                 email=email,
                 telefono=telefono,
-                direccion=direccion
+                direccion=direccion,
+                fecha_ingreso=fecha_ingreso
             )
         )
         if socio_actualizado is None:
@@ -171,12 +175,14 @@ async def delete_socio(request: Request, socio_id: int, db: Session = Depends(ge
 #=============================== PLANES S O C I A L E S ================================================
 
 # Mostrar formulario para crear un plan social
-@router.get("/crear_plan_social", response_class=HTMLResponse, tags=["Planes Sociales"])
+@router.get("/crear_plan_social", response_class=HTMLResponse, tags=["Planes sociales"])
 async def show_create_plan_social_form(request: Request):
     return templates.TemplateResponse("crear_plan_social.html", {"request": request})
 
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+
 # Crear un nuevo plan social
-@router.post("/crear_plan_social", response_class=HTMLResponse, tags=["Planes Sociales"])
+@router.post("/crear_plan_social", response_class=HTMLResponse, tags=["Planes sociales"])
 async def create_plan_social(
     request: Request,
     nombre_plan_social: str = Form(...),
@@ -194,8 +200,10 @@ async def create_plan_social(
         "message": message
     })
 
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+
 # Leer todos los planes sociales
-@router.get("/read_planes_sociales", response_class=HTMLResponse)
+@router.get("/read_planes_sociales", response_class=HTMLResponse, tags=["Planes sociales"])
 async def read_planes_sociales(request: Request, db: Session = Depends(get_db)):
     planes_sociales = crud.get_all_planes_sociales(db)  # Cambiado a get_all_planes_sociales
     return templates.TemplateResponse("read_planes_sociales.html", {
@@ -203,8 +211,10 @@ async def read_planes_sociales(request: Request, db: Session = Depends(get_db)):
         "planes_sociales": planes_sociales
     })
 
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+
 # Obtener un plan social por ID
-@router.get("/planes_sociales/{plan_social_id}", response_class=HTMLResponse, tags=["Planes Sociales"])
+@router.get("/planes_sociales/{plan_social_id}", response_class=HTMLResponse, tags=["Planes sociales"])
 async def read_plan_social(plan_social_id: int, db: Session = Depends(get_db)):
     plan_social = crud.get_plan_social(db, plan_social_id)
     if plan_social is None:
@@ -213,8 +223,10 @@ async def read_plan_social(plan_social_id: int, db: Session = Depends(get_db)):
         "plan_social": plan_social
     })
 
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+
 # Actualizar un plan social
-@router.post("/planes_sociales/{plan_social_id}/actualizar", response_class=HTMLResponse, tags=["Planes Sociales"])
+@router.post("/planes_sociales/{plan_social_id}/actualizar", response_class=HTMLResponse, tags=["Planes sociales"])
 async def update_plan_social(
     plan_social_id: int,
     request: Request,
@@ -236,8 +248,10 @@ async def update_plan_social(
         "plan_social": plan_actualizado
     })
 
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+
 # Eliminar un plan social
-@router.post("/planes_sociales/{plan_social_id}/eliminar", tags=["Planes Sociales"])
+@router.post("/planes_sociales/{plan_social_id}/eliminar", tags=["Planes sociales"])
 async def delete_plan_social(plan_social_id: int, db: Session = Depends(get_db)):
     result = crud.delete_plan_social(db, plan_social_id)
     
@@ -247,12 +261,14 @@ async def delete_plan_social(plan_social_id: int, db: Session = Depends(get_db))
     return {"message": "Plan social eliminado exitosamente"}
 
 #=============================== C O M B O S ================================================
-# Mostrar formulario para crear un plan
-@router.get("/crear_plan", response_class=HTMLResponse, tags=["Plan combo"])
+# Mostrar formulario para crear un combo (get)
+@router.get("/crear_plan", response_class=HTMLResponse, tags=["Combos"])
 async def show_create_plan_form(request: Request):
     return templates.TemplateResponse("crear_plan.html", {"request": request})
 
-@router.post("/crear_plan", response_class=HTMLResponse, tags=["Plan combo"])
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+# Mostrar formulario para crear un combo (post)
+@router.post("/crear_plan", response_class=HTMLResponse, tags=["Combos"])
 async def create_plan_endpoint(
     request: Request,
     nombre_plan: str = Form(...),
@@ -273,18 +289,21 @@ async def create_plan_endpoint(
         "message": message
     })
 
-# Leer todos los planes
-@router.get("/read_combos", response_class=HTMLResponse)
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+
+# Leer todos los combos
+@router.get("/read_combos", response_class=HTMLResponse, tags=["Combos"])
 async def read_planes(request: Request, db: Session = Depends(get_db)):
     planes = crud.get_all_planes(db)
-    print(planes)  # Verificar en la consola si se obtienen los datos correctamente
     return templates.TemplateResponse("read_combos.html", {
         "request": request,
         "combos": planes
     })
 
-# Obtener un plan por ID (detalles)
-@router.get("/planes/{plan_id}", response_class=HTMLResponse)
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+
+# Obtener un combo por ID (detalles)
+@router.get("/planes/{plan_id}", response_class=HTMLResponse, tags=["Combos"])
 async def read_plan(plan_id: int, request: Request, db: Session = Depends(get_db)):
     plan = crud.get_plan_by_id(db, plan_id)
     if not plan:
@@ -294,8 +313,10 @@ async def read_plan(plan_id: int, request: Request, db: Session = Depends(get_db
         "plan": plan
     })
 
-# Actualizar un plan
-@router.post("/planes/{plan_id}/actualizar", response_class=HTMLResponse)
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+
+# Actualizar un combo
+@router.post("/planes/{plan_id}/actualizar", response_class=HTMLResponse, tags=["Combos"])
 async def update_plan_endpoint(
     plan_id: int,
     request: Request,
@@ -319,8 +340,10 @@ async def update_plan_endpoint(
         "plan": plan_actualizado
     })
 
-# Eliminar un plan
-@router.post("/planes/{plan_id}/eliminar", status_code=200)
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+
+# Eliminar un combo
+@router.post("/planes/{plan_id}/eliminar", status_code=200, tags=["Combos"])
 async def delete_plan(plan_id: int, db: Session = Depends(get_db)):
     result = crud.delete_plan(db, plan_id)
     if result["status"] == "error":
@@ -360,6 +383,8 @@ async def create_asistencia(
         raise HTTPException(status_code=400, detail=f"Error al registrar asistencia: {str(e)}")
 
 
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+
 # Leer todas las asistencias
 @router.get("/read_asistencias", response_class=HTMLResponse, tags=["Asistencias"])
 async def read_asistencias(request: Request, db: Session = Depends(get_db)):
@@ -369,9 +394,13 @@ async def read_asistencias(request: Request, db: Session = Depends(get_db)):
         "asistencias": asistencias
     })
 
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+
 @router.get("/asistencias", response_model=List[schemas.Asistencia], tags=["Asistencias"])
 async def get_all_asistencias(db: Session = Depends(get_db)):
     return crud.get_all_asistencias(db)
+
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
 # Eliminar una asistencia
 @router.post("/read_asistencias/{asistencia_id}/eliminar", tags=["Asistencias"])
@@ -382,6 +411,8 @@ async def delete_asistencia(asistencia_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail=result["message"])
 
     return {"message": "Asistencia eliminada exitosamente"}
+
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
 @router.get("/read_asistencias/filtrar", response_class=HTMLResponse, tags=["Asistencias"])
 async def filter_asistencias(
@@ -394,6 +425,8 @@ async def filter_asistencias(
         "request": request,
         "asistencias": asistencias
     })
+
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
 @router.get("/read_asistencias/informe", response_class=HTMLResponse, tags=["Asistencias"])
 async def informe_asistencias(
@@ -411,6 +444,8 @@ async def informe_asistencias(
         "socio": socio
     })
 
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+
 @router.post("/read_asistencias/{asistencia_id}/actualizar", response_class=HTMLResponse, tags=["Asistencias"])
 async def update_asistencia(
     request: Request,
@@ -425,12 +460,12 @@ async def update_asistencia(
 
 #=============================== L O G I N ================================================
 
-@router.get("/login")
+@router.get("/login" , tags=["Login"])
 def login_page(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
 
 # Endpoint de autenticación
-@router.post("/login")
+@router.post("/login" , tags=["Login"])
 def login(request: Request, name: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
     user = crud.get_login_by_name(db, name)
     if user and user.password == password:
@@ -442,7 +477,7 @@ def login(request: Request, name: str = Form(...), password: str = Form(...), db
         response.set_cookie(key="login_error", value="Credenciales incorrectas", max_age=10)
         return response
     
-@router.get("/index")
+@router.get("/index" , tags=["Login"])
 def show_index(request: Request):
     authenticated = request.cookies.get("authenticated")
     if authenticated == "true":
@@ -451,9 +486,38 @@ def show_index(request: Request):
         return RedirectResponse(url="/login")
     
 
-@router.get("/logout", tags=["auth"])
+@router.get("/logout", tags=["Login"])
 def logout(response: Response):
     response.delete_cookie("authenticated")
     return RedirectResponse(url="/login")
 
 
+#=============================== C O B R O S ================================================
+
+@router.get("/read_ingresos", response_class=HTMLResponse , tags=["Cobros"])
+async def show_ingresos_semanales(request: Request, db: Session = Depends(get_db)):
+    """
+    Muestra los socios con cobro pendiente esta semana en el template 'read_ingresos.html'.
+    """
+    socios = crud.get_socios_cobro_semanal(db)
+
+    if not socios:
+        print("No hay datos para mostrar en el template.")
+        socios_data = []
+    else:
+        print(f"Datos enviados al template ({len(socios)} registros):")
+        socios_data = []
+        for socio in socios:
+            fecha_cobro = socio.fecha_ingreso + timedelta(days=30)
+            print(f"Nombre: {socio.nombre}, Apellido: {socio.apellido}, Fecha Cobro: {fecha_cobro}")
+            socios_data.append({
+                "nombre": socio.nombre,
+                "apellido": socio.apellido,
+                "combo": socio.plan.nombre_plan if socio.plan else "Sin plan",
+                "fecha_cobro": fecha_cobro.strftime('%Y-%m-%d')  # Formato amigable
+            })
+
+    return templates.TemplateResponse("read_ingresos.html", {
+        "request": request,
+        "socios": socios_data
+    })

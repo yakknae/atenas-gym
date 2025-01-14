@@ -1,11 +1,12 @@
 from sqlalchemy.orm import Session
 from app import models, schemas
 from datetime import date, timedelta
-from typing import Dict
 import logging
 from fastapi import Request
-from datetime import datetime, time
-from sqlalchemy import or_
+from datetime import time
+from sqlalchemy import or_ , text , func
+
+
 
 #=============================== S O C I O S ================================================
 def create_socio(db: Session, socio: schemas.SocioCreate):
@@ -209,3 +210,31 @@ def get_asistencias_by_socio(db: Session, socio: str):
 def convert_to_string(hour: time):
     return hour.strftime("%H:%M:%S") if hour else None    
     
+
+
+#=============================== C O B R O S ================================================
+
+def get_socios_cobro_semanal(db: Session):
+    """
+    Obtiene los socios cuya fecha de cobro (fecha_ingreso + 30 días) cae en la semana actual.
+    """
+    today = date.today()
+    end_of_week = today + timedelta(days=6)
+
+    socios = (
+        db.query(models.Socio)
+        .filter(
+            models.Socio.fecha_ingreso.isnot(None),
+            func.date_add(models.Socio.fecha_ingreso, text("INTERVAL 30 DAY")) >= today,
+            func.date_add(models.Socio.fecha_ingreso, text("INTERVAL 30 DAY")) <= end_of_week,
+        )
+        .all()
+    )
+
+    # Log para depuración
+    print(f"Socios encontrados para esta semana ({len(socios)} registros):")
+    for socio in socios:
+        fecha_cobro = socio.fecha_ingreso + timedelta(days=30)
+        print(f"Nombre: {socio.nombre}, Apellido: {socio.apellido}, Fecha Cobro: {fecha_cobro}")
+
+    return socios
