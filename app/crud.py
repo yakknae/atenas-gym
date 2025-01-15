@@ -62,8 +62,12 @@ def delete_socio(db: Session, socio_id: int) -> dict:
 def get_plan_social(db: Session, plan_social_id: int):
     return db.query(models.PlanSocial).filter(models.PlanSocial.id_plan_social == plan_social_id).first()
 
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+
 def get_all_planes_sociales(db: Session):
     return db.query(models.PlanSocial).all()
+
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
 def create_plan_social(db: Session, plan_social: schemas.PlanSocialCreate):
     nuevo_plan = models.PlanSocial(**plan_social.dict())
@@ -71,6 +75,8 @@ def create_plan_social(db: Session, plan_social: schemas.PlanSocialCreate):
     db.commit()
     db.refresh(nuevo_plan)
     return nuevo_plan
+
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
 def update_plan_social(db: Session, plan_social_id: int, plan_social_update: schemas.PlanSocialUpdate):
     plan_db = get_plan_social(db, plan_social_id)
@@ -80,6 +86,8 @@ def update_plan_social(db: Session, plan_social_id: int, plan_social_update: sch
         db.commit()
         db.refresh(plan_db)
     return plan_db
+
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
 def delete_plan_social(db: Session, plan_social_id: int):
     plan_db = db.query(models.PlanSocial).filter(models.PlanSocial.id_plan_social == plan_social_id).first()
@@ -95,8 +103,12 @@ def delete_plan_social(db: Session, plan_social_id: int):
 def get_plan(db: Session, plan_id: int):
     return db.query(models.Plan).filter(models.Plan.id_plan == plan_id).first()
 
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+
 def get_all_planes(db: Session):
     return db.query(models.Plan).all()
+
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
 def create_plan(db: Session, plan: schemas.PlanCreate):
     nuevo_plan = models.Plan(**plan.dict())
@@ -104,6 +116,8 @@ def create_plan(db: Session, plan: schemas.PlanCreate):
     db.commit()
     db.refresh(nuevo_plan)
     return nuevo_plan
+
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
 def update_plan(db: Session, plan_id: int, plan_update: schemas.PlanUpdate):
     plan_db = db.query(models.Plan).filter(models.Plan.id_plan == plan_id).first()
@@ -113,6 +127,8 @@ def update_plan(db: Session, plan_id: int, plan_update: schemas.PlanUpdate):
         db.commit()
         db.refresh(plan_db)
     return plan_db
+
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
 def delete_plan(db: Session, plan_id: int):
     plan = db.query(models.Plan).filter(models.Plan.id_plan == plan_id).first()
@@ -136,8 +152,12 @@ def create_asistencia(db: Session, asistencia: schemas.AsistenciaCreate):
     db.refresh(db_asistencia)
     return db_asistencia
 
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+
 def get_all_asistencias(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Asistencia).offset(skip).limit(limit).all()
+
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
 def eliminar_asistencia(db: Session, asistencia_id: int):
     asistencia = db.query(models.Asistencia).filter(models.Asistencia.id == asistencia_id).first()
@@ -156,13 +176,19 @@ def create_login(db: Session, login_data: schemas.LoginCreate):
     db.refresh(db_login)  # Actualizar el objeto con la información de la base de datos
     return db_login
 
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+
 # Obtener usuario por nombre
 def get_login_by_name(db: Session, name: str):
     return db.query(models.login).filter(models.login.name == name).first()
 
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+
 def log_logout(db: Session, user_id: int):
     logging.info(f"Usuario con ID {user_id} ha cerrado sesión.")
     return True
+
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
 def check_authenticated(request: Request) -> bool:
     """
@@ -176,8 +202,12 @@ def check_authenticated(request: Request) -> bool:
 def get_all_socios(db: Session):
     return db.query(models.Socio).all()
 
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+
 def get_asistencias_by_date(db: Session, fecha: str):
     return db.query(models.Asistencia).filter(models.Asistencia.fecha == fecha).all()
+
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
 def get_asistencias_by_socio(db: Session, socio: str):
     return (
@@ -190,6 +220,8 @@ def get_asistencias_by_socio(db: Session, socio: str):
         .all()
     )
 
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+
 def update_asistencia(db: Session, asistencia_id: int, socio_id: int):
     asistencia = db.query(models.Asistencia).filter(models.Asistencia.id == asistencia_id).first()
     if not asistencia:
@@ -198,6 +230,7 @@ def update_asistencia(db: Session, asistencia_id: int, socio_id: int):
     db.commit()
     return {"status": "success", "message": "Asistencia actualizada"}
 
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
 def get_asistencias_by_socio(db: Session, socio: str):
     try:
@@ -207,6 +240,8 @@ def get_asistencias_by_socio(db: Session, socio: str):
         print(f"Error al ejecutar la consulta: {e}")
         return []
     
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+
 def convert_to_string(hour: time):
     return hour.strftime("%H:%M:%S") if hour else None    
     
@@ -214,27 +249,86 @@ def convert_to_string(hour: time):
 
 #=============================== C O B R O S ================================================
 
-def get_socios_cobro_semanal(db: Session):
+def get_socios_cobro_semanal(db: Session, start_of_week: date, end_of_week: date):
     """
-    Obtiene los socios cuya fecha de cobro (fecha_ingreso + 30 días) cae en la semana actual.
+    Obtiene los socios cuya fecha de cobro (fecha_ingreso + 30 días) cae en el rango de la semana actual.
     """
-    today = date.today()
-    end_of_week = today + timedelta(days=6)
-
     socios = (
         db.query(models.Socio)
         .filter(
             models.Socio.fecha_ingreso.isnot(None),
-            func.date_add(models.Socio.fecha_ingreso, text("INTERVAL 30 DAY")) >= today,
+            func.date_add(models.Socio.fecha_ingreso, text("INTERVAL 30 DAY")) >= start_of_week,
             func.date_add(models.Socio.fecha_ingreso, text("INTERVAL 30 DAY")) <= end_of_week,
         )
         .all()
     )
 
     # Log para depuración
-    print(f"Socios encontrados para esta semana ({len(socios)} registros):")
+    print(f"Socios encontrados para el rango {start_of_week} - {end_of_week} ({len(socios)} registros):")
     for socio in socios:
         fecha_cobro = socio.fecha_ingreso + timedelta(days=30)
+        print(f"Nombre: {socio.nombre}, Apellido: {socio.apellido}, Fecha Cobro: {fecha_cobro}")
+
+    return socios
+
+
+
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+def calcular_fechas_cobro(fecha_ingreso, fecha_actual):
+    """
+    Calcula todas las fechas de cobro mensuales para un socio
+    desde su fecha de ingreso hasta la fecha actual.
+    """
+    fechas_cobro = []
+    fecha_cobro = fecha_ingreso + timedelta(days=30)
+    
+    while fecha_cobro <= fecha_actual:
+        fechas_cobro.append(fecha_cobro)
+        fecha_cobro += timedelta(days=30)  # Incremento mensual
+    
+    return fechas_cobro
+
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+def filtrar_fechas_semana_actual(fechas_cobro, start_of_week, end_of_week):
+    """
+    Filtra las fechas de cobro que caen dentro de la semana actual.
+    """
+    return [fecha for fecha in fechas_cobro if start_of_week <= fecha <= end_of_week]
+
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+def get_socios_cobro_semana_anterior(db: Session):
+    """
+    Obtiene los socios cuya fecha de cobro (fecha_ingreso + múltiplos de 30 días) cayó en la semana anterior.
+    """
+    today = date.today()
+    start_of_last_week = today - timedelta(days=today.weekday() + 7)  # Lunes de la semana pasada
+    end_of_last_week = start_of_last_week + timedelta(days=6)  # Domingo de la semana pasada
+
+    # Consulta ajustada para incluir fechas acumulativas de cobro
+    socios = (
+        db.query(models.Socio)
+        .filter(
+            models.Socio.fecha_ingreso.isnot(None),
+            func.date_add(
+                models.Socio.fecha_ingreso, 
+                text("INTERVAL 30 * FLOOR(DATEDIFF(:start_date, fecha_ingreso) / 30) DAY")
+            ) >= start_of_last_week,
+            func.date_add(
+                models.Socio.fecha_ingreso, 
+                text("INTERVAL 30 * FLOOR(DATEDIFF(:start_date, fecha_ingreso) / 30) DAY")
+            ) <= end_of_last_week,
+        )
+        .params(start_date=end_of_last_week)  # Pasamos el parámetro para la consulta SQL
+        .all()
+    )
+
+    # Log para depuración
+    print(f"Socios encontrados para la semana anterior ({len(socios)} registros):")
+    for socio in socios:
+        # Calculamos la fecha de cobro acumulativa
+        dias_transcurridos = (start_of_last_week - socio.fecha_ingreso).days
+        ciclos_completos = dias_transcurridos // 30
+        fecha_cobro = socio.fecha_ingreso + timedelta(days=30 * ciclos_completos)
         print(f"Nombre: {socio.nombre}, Apellido: {socio.apellido}, Fecha Cobro: {fecha_cobro}")
 
     return socios

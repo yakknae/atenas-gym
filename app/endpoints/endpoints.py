@@ -464,6 +464,8 @@ async def update_asistencia(
 def login_page(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
 
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+
 # Endpoint de autenticación
 @router.post("/login" , tags=["Login"])
 def login(request: Request, name: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
@@ -477,6 +479,8 @@ def login(request: Request, name: str = Form(...), password: str = Form(...), db
         response.set_cookie(key="login_error", value="Credenciales incorrectas", max_age=10)
         return response
     
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+    
 @router.get("/index" , tags=["Login"])
 def show_index(request: Request):
     authenticated = request.cookies.get("authenticated")
@@ -485,6 +489,7 @@ def show_index(request: Request):
     else:
         return RedirectResponse(url="/login")
     
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
 @router.get("/logout", tags=["Login"])
 def logout(response: Response):
@@ -494,12 +499,16 @@ def logout(response: Response):
 
 #=============================== C O B R O S ================================================
 
-@router.get("/read_ingresos", response_class=HTMLResponse , tags=["Cobros"])
+@router.get("/read_ingresos", response_class=HTMLResponse, tags=["Cobros"])
 async def show_ingresos_semanales(request: Request, db: Session = Depends(get_db)):
     """
     Muestra los socios con cobro pendiente esta semana en el template 'read_ingresos.html'.
     """
-    socios = crud.get_socios_cobro_semanal(db)
+    today = datetime.now().date()
+    start_of_week = today - timedelta(days=today.weekday())  # Lunes de esta semana
+    end_of_week = start_of_week + timedelta(days=6)  # Domingo de esta semana
+
+    socios = crud.get_socios_cobro_semanal(db, start_of_week, end_of_week)
 
     if not socios:
         print("No hay datos para mostrar en el template.")
@@ -514,10 +523,50 @@ async def show_ingresos_semanales(request: Request, db: Session = Depends(get_db
                 "nombre": socio.nombre,
                 "apellido": socio.apellido,
                 "combo": socio.plan.nombre_plan if socio.plan else "Sin plan",
+                "precio": socio.plan.precio if socio.plan else 0,
                 "fecha_cobro": fecha_cobro.strftime('%Y-%m-%d')  # Formato amigable
             })
 
     return templates.TemplateResponse("read_ingresos.html", {
         "request": request,
-        "socios": socios_data
+        "socios": socios_data,
+        "start_of_week": start_of_week.strftime('%Y-%m-%d'),
+        "end_of_week": end_of_week.strftime('%Y-%m-%d')
+    })
+
+
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+@router.get("/read_ingresosOLD", response_class=HTMLResponse, tags=["Cobros"])
+async def show_ingresos_semana_anterior(request: Request, db: Session = Depends(get_db)):
+    """
+    Muestra los socios con cobro pendiente la semana pasada en el template 'read_ingresosOLD.html'.
+    """
+    today = datetime.now().date()
+    start_of_last_week = today - timedelta(days=today.weekday() + 7)  # Lunes de la semana pasada
+    end_of_last_week = start_of_last_week + timedelta(days=6)  # Domingo de la semana pasada
+    
+    socios = crud.get_socios_cobro_semana_anterior(db)
+
+    if not socios:
+        print("No hay datos para mostrar en el template.")
+        socios_data = []
+    else:
+        print(f"Datos enviados al template ({len(socios)} registros):")
+        socios_data = []
+        for socio in socios:
+            fecha_cobro = socio.fecha_ingreso + timedelta(days=30)
+            print(f"Nombre: {socio.nombre}, Apellido: {socio.apellido}, Fecha Cobro: {fecha_cobro}")
+            socios_data.append({
+                "nombre": socio.nombre,
+                "apellido": socio.apellido,
+                "combo": socio.plan.nombre_plan if socio.plan else "Sin plan",
+                "precio": socio.plan.precio if socio.plan else 0,
+                "fecha_cobro": fecha_cobro.strftime('%Y-%m-%d')  # Formato amigable
+            })
+
+    return templates.TemplateResponse("read_ingresosOLD.html", {
+        "request": request,
+        "socios": socios_data,
+        "start_of_week": start_of_last_week.strftime('%Y-%m-%d'),
+        "end_of_week": end_of_last_week.strftime('%Y-%m-%d')
     })
