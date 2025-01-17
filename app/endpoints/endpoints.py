@@ -114,49 +114,110 @@ async def read_socio(socio_id: int, db: Session = Depends(get_db)):
 
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
-# Actualizar un socio (POST)
-@router.post("/socios/{socio_id}/actualizar", response_class=HTMLResponse, tags=["Socios"])
-async def actualizar_socio(
+# Ruta GET para mostrar el formulario de selección de socio
+@router.get("/actualizar_socio/{socio_id}", response_class=HTMLResponse, tags=["Socios"])
+async def mostrar_formulario_actualizacion(request: Request, socio_id: int, db: Session = Depends(get_db)):
+    """
+    Muestra el formulario para actualizar los datos del socio dado su ID.
+    """
+    socio = crud.get_socio(db, socio_id)
+    if not socio:
+        return templates.TemplateResponse("read_socios.html", {
+            "request": request,
+            "socios": crud.get_all_socios(db),
+            "message": f"Socio con ID {socio_id} no encontrado.",
+        })
+
+    planes = crud.get_all_planes(db)
+    planes_sociales = crud.get_all_planes_sociales(db)
+
+    return templates.TemplateResponse("actualizar_socio.html", {
+        "request": request,
+        "socio": socio,
+        "planes": planes,
+        "planes_sociales": planes_sociales,
+        "message": None,
+    })
+
+@router.post("/actualizar_socio", response_class=HTMLResponse, tags=["Socios"])
+async def mostrar_formulario_actualizacion(
     request: Request,
-    socio_id: int,
-    nombre: str = Form(None),
-    apellido: str = Form(None),
-    dni: int = Form(None),
-    fecha_nacimiento: str = Form(None),
-    genero: str = Form(None),
-    email: str = Form(None),
-    telefono: str = Form(None),
-    direccion: str = Form(None),
-    fecha_ingreso: str = Form(None),
+    socio_id: int = Form(...),  # Recibe el ID del socio
     db: Session = Depends(get_db),
-      
 ):
-    try:
-        socio_actualizado = crud.update_socio(
-            db,
-            socio_id,
-            schemas.SocioUpdate(
-                nombre=nombre,
-                apellido=apellido,
-                dni=dni,
-                fecha_nacimiento=fecha_nacimiento,
-                genero=genero,
-                email=email,
-                telefono=telefono,
-                direccion=direccion,
-                fecha_ingreso=fecha_ingreso
-            )
-        )
-        if socio_actualizado is None:
-            raise HTTPException(status_code=404, detail="Socio no encontrado")
-        message = "Socio actualizado exitosamente"
-    except Exception as e:
-        message = f"Error al actualizar el socio: {str(e)}"
-    
+    """
+    Muestra el formulario para actualizar los datos del socio.
+    """
+    socio = crud.get_socio(db, socio_id)
+    if not socio:
+        return templates.TemplateResponse("ver_socios.html", {
+            "request": request,
+            "socios": crud.get_all_socios(db),
+            "message": "Socio no encontrado",
+        })
+
+    planes = crud.get_all_planes(db)
+    planes_sociales = crud.get_all_planes_sociales(db)
+
+    return templates.TemplateResponse("actualizar_socio.html", {
+        "request": request,
+        "socio": socio,
+        "planes": planes,
+        "planes_sociales": planes_sociales,
+        "message": None,
+    })
+
+
+@router.post("/guardar_actualizacion", response_class=HTMLResponse, tags=["Socios"])
+async def guardar_actualizacion(
+    request: Request,
+    nombre: str = Form(...),
+    apellido: str = Form(...),
+    dni: int = Form(...),
+    fecha_nacimiento: str = Form(...),
+    genero: str = Form(...),
+    email: str = Form(...),
+    telefono: str = Form(...),
+    direccion: str = Form(...),
+    fecha_ingreso: str = Form(...),
+    id_plan: int = Form(...),
+    id_plan_social: int = Form(...),
+    socio_id: int = Form(...),
+    db: Session = Depends(get_db),
+):
+    """
+    Guarda los cambios realizados en los datos del socio.
+    """
+    socio = crud.get_socio(db, socio_id)
+    if not socio:
+        return templates.TemplateResponse("ver_socios.html", {
+            "request": request,
+            "socios": crud.get_all_socios(db),
+            "message": "Socio no encontrado",
+        })
+
+    # Actualizar los campos del socio
+    socio.nombre = nombre
+    socio.apellido = apellido
+    socio.dni = dni
+    socio.fecha_nacimiento = fecha_nacimiento
+    socio.genero = genero
+    socio.email = email
+    socio.telefono = telefono
+    socio.direccion = direccion
+    socio.fecha_ingreso = fecha_ingreso
+    socio.id_plan = id_plan
+    socio.id_plan_social = id_plan_social
+
+    db.commit()  # Guardar cambios en la base de datos
+    db.refresh(socio)  # Refrescar los datos del socio
+
     return templates.TemplateResponse("read_socios.html", {
         "request": request,
-        "message": message
+        "socios": crud.get_all_socios(db),
+        "message": "Socio actualizado exitosamente",
     })
+
 
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 

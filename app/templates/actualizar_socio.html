@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actualizar Socio</title>
+    <link rel="stylesheet" href="/static/crear.css">
+</head>
+<body>
+    <div>
+        <nav>
+            <ul>
+                <li><a href="/index">Inicio</a></li>
+                <li><a href="/read_socios">Ver Socios</a></li>
+            </ul>
+            <h1>Actualizar Socio</h1>
+        </nav>
+    </div>
+
+    {% if socio %}
+    <div class="form-container">
+        <form action="/guardar_actualizacion" method="post">
+            <!-- Aquí cargamos los datos del socio seleccionados -->
+            <input type="hidden" name="socio_id" value="{{ socio.id_socio }}" />
+
+            <!-- Fila de campos en dos columnas -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="nombre">Nombre:</label>
+                    <input type="text" id="nombre" name="nombre" required value="{{ socio.nombre }}" />
+                </div>
+
+                <div class="form-group">
+                    <label for="apellido">Apellido:</label>
+                    <input type="text" id="apellido" name="apellido" required value="{{ socio.apellido }}" />
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="dni">DNI:</label>
+                    <input type="number" id="dni" name="dni" required value="{{ socio.dni }}" />
+                </div>
+
+                <div class="form-group">
+                    <label for="fecha_nacimiento">Fecha de Nacimiento:</label>
+                    <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required value="{{ socio.fecha_nacimiento }}" />
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="genero">Género:</label>
+                    <select id="genero" name="genero" required>
+                        <option value="Hombre" {% if socio.genero == 'Hombre' %}selected{% endif %}>Hombre</option>
+                        <option value="Mujer" {% if socio.genero == 'Mujer' %}selected{% endif %}>Mujer</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required value="{{ socio.email }}" />
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="telefono">Teléfono:</label>
+                    <input type="text" id="telefono" name="telefono" required value="{{ socio.telefono }}" />
+                </div>
+
+                <div class="form-group">
+                    <label for="direccion">Dirección:</label>
+                    <input type="text" id="direccion" name="direccion" required value="{{ socio.direccion }}" />
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="fecha_ingreso">Fecha de ingreso:</label>
+                    <input type="date" id="fecha_ingreso" name="fecha_ingreso" required value="{{ socio.fecha_ingreso }}" />
+                </div>
+
+                <div class="form-group">
+                    <label for="id_plan">Plan:</label>
+                    <select id="id_plan" name="id_plan" required>
+                        <option value="" disabled>Seleccionar plan</option>
+                        {% for plan in planes %}
+                            <option value="{{ plan.id_plan }}" {% if socio.id_plan == plan.id_plan %}selected{% endif %}>
+                                {{ plan.nombre_plan }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="id_plan_social">Seguro médico:</label>
+                    <select id="id_plan_social" name="id_plan_social" required>
+                        <option value="" disabled>Seleccionar plan social</option>
+                        {% for plan_social in planes_sociales %}
+                            <option value="{{ plan_social.id_plan_social }}" {% if socio.id_plan_social == plan_social.id_plan_social %}selected{% endif %}>
+                                {{ plan_social.nombre_plan_social }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <button type="submit">Actualizar Socio</button>
+            </div>
+        </form>
+    </div>
+    {% else %}
+        <p>No se ha encontrado el socio o el ID es incorrecto.</p>
+    {% endif %}
+
+    <div class="background-image"></div>
+
+    {% if message %}
+    <div class="message-container">
+        <p class="message">{{ message }}</p>
+    </div>
+    {% endif %}
+</body>
+</html>

@@ -31,10 +31,11 @@ def get_socio(db: Session, socio_id: int):
 def update_socio(db: Session, socio_id: int, socio_update: schemas.SocioUpdate):
     socio = get_socio(db, socio_id)
     if not socio:
-        return None
+        raise ValueError(f"No se encontró el socio con ID {socio_id}")
     for key, value in socio_update.dict(exclude_unset=True).items():
         setattr(socio, key, value)
     db.commit()
+    db.refresh(socio)  # Asegura que los cambios se reflejen en el objeto
     return socio
 
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//

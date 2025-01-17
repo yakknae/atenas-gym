@@ -57,6 +57,10 @@
           <td>{{ socio.plan_social.nombre_plan_social if socio.plan_social else 'Sin Plan Social' }}</td>
           <td>
             <button onclick="showDeleteForm('{{ socio.id_socio }}')">Eliminar</button>
+            <form action="/actualizar_socio" method="post" style="display: inline">
+              <input type="hidden" name="socio_id" value="{{ socio.id_socio }}" />
+              <button type="submit">Actualizar</button>
+            </form>
           </td>
         </tr>
         {% endfor %}

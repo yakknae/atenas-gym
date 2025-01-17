@@ -61,14 +61,17 @@ class SocioCreate(SocioBase):
     pass
 
 class SocioUpdate(SocioBase):
-    nombre: str = None
-    apellido: str = None
-    dni: int = None
-    fecha_nacimiento: date = None
-    genero: str = None
-    email: str = None
-    telefono: str = None
-    direccion: str = None
+    nombre: Optional[str]
+    apellido: Optional[str]
+    dni: Optional[int]
+    fecha_nacimiento: Optional[str]
+    genero: Optional[str]
+    email: Optional[str]
+    telefono: Optional[str]
+    direccion: Optional[str]
+    fecha_ingreso: Optional[str]
+    id_plan: Optional[int]
+    id_plan_social: Optional[int]
 
 class Socio(SocioBase):
     id_socio: int

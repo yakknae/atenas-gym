@@ -1,0 +1,33 @@
+/* Estilo base para el formulario */
+.form-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+/* Estilo para el grupo de campos */
+.form-group {
+  margin-bottom: 15px;
+}
+
+/* Utilizamos flexbox para organizar los campos en 2 columnas */
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px; /* Espacio entre los campos */
+}
+
+/* Estilo para cada campo dentro de la fila */
+.form-row .form-group {
+  flex: 1 1 45%; /* 45% de ancho para cada campo */
+}
+
+/* Para asegurarnos de que los campos no se "rompan" en pantallas pequeñas */
+@media (max-width: 768px) {
+  .form-row .form-group {
+    flex: 1 1 100%; /* En pantallas pequeñas, cada campo ocupa toda la fila */
+  }
+}
