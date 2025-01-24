@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Actualizar Socio</title>
-    <link rel="stylesheet" href="/static/crear.css">
+    <link rel="stylesheet" href="/static/Actualizar_socio.css">
 </head>
 <body>
     <div>
@@ -20,16 +20,13 @@
     {% if socio %}
     <div class="form-container">
         <form action="/guardar_actualizacion" method="post">
-            <!-- Aquí cargamos los datos del socio seleccionados -->
             <input type="hidden" name="socio_id" value="{{ socio.id_socio }}" />
 
-            <!-- Fila de campos en dos columnas -->
             <div class="form-row">
                 <div class="form-group">
                     <label for="nombre">Nombre:</label>
                     <input type="text" id="nombre" name="nombre" required value="{{ socio.nombre }}" />
                 </div>
-
                 <div class="form-group">
                     <label for="apellido">Apellido:</label>
                     <input type="text" id="apellido" name="apellido" required value="{{ socio.apellido }}" />
@@ -41,7 +38,6 @@
                     <label for="dni">DNI:</label>
                     <input type="number" id="dni" name="dni" required value="{{ socio.dni }}" />
                 </div>
-
                 <div class="form-group">
                     <label for="fecha_nacimiento">Fecha de Nacimiento:</label>
                     <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required value="{{ socio.fecha_nacimiento }}" />
@@ -56,7 +52,6 @@
                         <option value="Mujer" {% if socio.genero == 'Mujer' %}selected{% endif %}>Mujer</option>
                     </select>
                 </div>
-
                 <div class="form-group">
                     <label for="email">Email:</label>
                     <input type="email" id="email" name="email" required value="{{ socio.email }}" />
@@ -68,24 +63,22 @@
                     <label for="telefono">Teléfono:</label>
                     <input type="text" id="telefono" name="telefono" required value="{{ socio.telefono }}" />
                 </div>
-
                 <div class="form-group">
                     <label for="direccion">Dirección:</label>
                     <input type="text" id="direccion" name="direccion" required value="{{ socio.direccion }}" />
                 </div>
             </div>
 
-            <div class="form-group">
-                <label for="fecha_ingreso">Fecha de ingreso:</label>
-                {% if socio.pagos %}
-                    {% set primer_pago = socio.pagos[0] %} 
-                    <input type="date" id="fecha_ingreso" name="fecha_ingreso" required value="{{ primer_pago.fecha_programada }}" />
-                {% else %}
-                    <input type="date" id="fecha_ingreso" name="fecha_ingreso" required value="" disabled />
-                {% endif %}
-            </div>
-
             <div class="form-row">
+                <div class="form-group">
+                    <label for="fecha_ingreso">Fecha de ingreso:</label>
+                    {% if socio.pagos %}
+                        {% set primer_pago = socio.pagos[0] %}
+                        <input type="date" id="fecha_ingreso" name="fecha_ingreso" required value="{{ primer_pago.fecha_programada }}" />
+                    {% else %}
+                        <input type="date" id="fecha_ingreso" name="fecha_ingreso" required value="" disabled />
+                    {% endif %}
+                </div>
                 <div class="form-group">
                     <label for="id_plan">Plan:</label>
                     <select id="id_plan" name="id_plan" required>
@@ -97,7 +90,9 @@
                         {% endfor %}
                     </select>
                 </div>
+            </div>
 
+            <div class="form-row">
                 <div class="form-group">
                     <label for="id_plan_social">Seguro médico:</label>
                     <select id="id_plan_social" name="id_plan_social" required>
@@ -111,7 +106,7 @@
                 </div>
             </div>
 
-            <div class="form-group">
+            <div class="form-group form-submit">
                 <button type="submit">Actualizar Socio</button>
             </div>
         </form>
