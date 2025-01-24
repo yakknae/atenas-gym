@@ -75,12 +75,17 @@
                 </div>
             </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="fecha_ingreso">Fecha de ingreso:</label>
-                    <input type="date" id="fecha_ingreso" name="fecha_ingreso" required value="{{ socio.fecha_ingreso }}" />
-                </div>
+            <div class="form-group">
+                <label for="fecha_ingreso">Fecha de ingreso:</label>
+                {% if socio.pagos %}
+                    {% set primer_pago = socio.pagos[0] %} 
+                    <input type="date" id="fecha_ingreso" name="fecha_ingreso" required value="{{ primer_pago.fecha_programada }}" />
+                {% else %}
+                    <input type="date" id="fecha_ingreso" name="fecha_ingreso" required value="" disabled />
+                {% endif %}
+            </div>
 
+            <div class="form-row">
                 <div class="form-group">
                     <label for="id_plan">Plan:</label>
                     <select id="id_plan" name="id_plan" required>
@@ -92,9 +97,7 @@
                         {% endfor %}
                     </select>
                 </div>
-            </div>
 
-            <div class="form-row">
                 <div class="form-group">
                     <label for="id_plan_social">Seguro médico:</label>
                     <select id="id_plan_social" name="id_plan_social" required>

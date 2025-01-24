@@ -35,7 +35,6 @@ class Socio(Base):
     email = Column(String(150))
     telefono = Column(String(20))
     direccion = Column(String(255))
-    fecha_ingreso = Column(Date)
     id_plan = Column(Integer, ForeignKey('planes.id_plan'))
     id_plan_social = Column(Integer, ForeignKey('planes_sociales.id_plan_social'))
 
@@ -43,7 +42,7 @@ class Socio(Base):
     plan = relationship("Plan", back_populates="socios")
     plan_social = relationship("PlanSocial", back_populates="socios")
     asistencias = relationship("Asistencia", back_populates="socio")
-
+    pagos = relationship("Pago", back_populates="socio")
 #=============================== A S I S T E N C I A S ================================================
 class Asistencia(Base):
     __tablename__ = 'asistencias'
@@ -61,3 +60,18 @@ class login(Base):
     id=Column(Integer, primary_key=True, autoincrement=True)
     name=Column(String(50),unique=True, nullable=False)
     password=Column(String(50),nullable=True)
+
+#=============================== P A G O S ================================================
+class Pago(Base):
+    __tablename__ = 'pagos'
+    id_pago = Column(Integer, primary_key=True, autoincrement=True)
+    id_socio = Column(Integer, ForeignKey('socios.id_socio'), nullable=False)  # Relación con socio
+    id_plan = Column(Integer, ForeignKey('planes.id_plan'), nullable=False)
+    fecha_programada = Column(Date, nullable=False)  # Fecha esperada de pago
+    fecha_pago = Column(Date, nullable=True)         # Fecha real de pago
+    estado_pago = Column(String(50), default='Pendiente')  # Estado: 'Pagado' o 'Pendiente'
+    mes_correspondiente = Column(Date, nullable=False)
+
+    # Relación con socios
+    socio = relationship("Socio", back_populates="pagos")
+    plan = relationship("Plan")

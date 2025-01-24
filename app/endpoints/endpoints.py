@@ -5,10 +5,11 @@ from app.database import SessionLocal
 from app import crud, schemas
 from fastapi.templating import Jinja2Templates
 import logging
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import  SQLAlchemyError
 from fastapi import Query
 from typing import List
 from datetime import datetime, timedelta
+from sqlalchemy.exc import IntegrityError
 
 
 
@@ -46,7 +47,9 @@ async def show_create_socio_form(request: Request, db: Session = Depends(get_db)
     })
 
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+from app import models
 
+# Crear un socio (POST)
 # Crear un socio (POST)
 @router.post("/crear_socio", response_class=HTMLResponse, tags=["Socios"])
 async def create_socio(
@@ -59,12 +62,25 @@ async def create_socio(
     email: str = Form(None),
     telefono: str = Form(None),
     direccion: str = Form(None),
-    fecha_ingreso: str = Form(...),
-    id_plan: int = Form(None),
+    fecha_programada: str = Form(...),  # Esto es para la fecha de pago
+    id_plan: int = Form(...),  # Asegúrate de que id_plan no sea None
     id_plan_social: int = Form(None),
     db: Session = Depends(get_db)
 ):
     try:
+        # Verificar que el plan existe
+        plan = db.query(models.Plan).filter(models.Plan.id_plan == id_plan).first()
+        if not plan:
+            raise ValueError("El plan con ID {} no existe.".format(id_plan))
+
+        # Verificar si el plan social existe (si se proporciona)
+        plan_social = None
+        if id_plan_social:
+            plan_social = db.query(models.PlanSocial).filter(models.PlanSocial.id_plan_social == id_plan_social).first()
+            if not plan_social:
+                raise ValueError("El plan social con ID {} no existe.".format(id_plan_social))
+
+        # Crear el socio
         socio_data = schemas.SocioCreate(
             nombre=nombre,
             apellido=apellido,
@@ -74,20 +90,34 @@ async def create_socio(
             email=email,
             telefono=telefono,
             direccion=direccion,
-            fecha_ingreso=fecha_ingreso,
-            id_plan=id_plan,
+            id_plan=id_plan,  # Asegurarse de que el plan no sea None
             id_plan_social=id_plan_social,
         )
-        crud.create_socio(db, socio_data)
+        db_socio = crud.create_socio(db, socio_data)
+
+        # Crear los pagos para el socio, separados por mes
+        fecha_programada_date = datetime.strptime(fecha_programada, '%Y-%m-%d')
+        for mes in range(1, 13):  # Crear pagos para 12 meses
+            fecha_pago = datetime(fecha_programada_date.year, mes, 1)  # Primer día de cada mes
+            crud.create_pago(db, db_socio.id_socio, id_plan, fecha_pago.strftime('%Y-%m-%d'))
+
         message = "Socio creado exitosamente."
     except IntegrityError as e:
         message = f"Error al crear el socio: {str(e)}"
+    except ValueError as ve:
+        message = str(ve)
     except Exception as e:
         message = f"Error al crear el socio: {str(e)}"
     
     # Redirigir a la misma página después de crear el socio
     url = str(request.url_for("show_create_socio_form"))
     return RedirectResponse(url=f"{url}?message={message}", status_code=303)
+
+
+
+
+
+
 
 
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
@@ -196,6 +226,16 @@ async def guardar_actualizacion(
             "message": "Socio no encontrado",
         })
 
+    # Convertir fecha_ingreso a datetime antes de actualizar
+    try:
+        socio.fecha_ingreso = datetime.strptime(fecha_ingreso, "%Y-%m-%d")
+    except ValueError:
+        return templates.TemplateResponse("ver_socios.html", {
+            "request": request,
+            "socios": crud.get_all_socios(db),
+            "message": "Formato de fecha incorrecto",
+        })
+
     # Actualizar los campos del socio
     socio.nombre = nombre
     socio.apellido = apellido
@@ -205,7 +245,6 @@ async def guardar_actualizacion(
     socio.email = email
     socio.telefono = telefono
     socio.direccion = direccion
-    socio.fecha_ingreso = fecha_ingreso
     socio.id_plan = id_plan
     socio.id_plan_social = id_plan_social
 
@@ -230,9 +269,12 @@ async def delete_socio(request: Request, socio_id: int, db: Session = Depends(ge
         if result.get("status") == "success":
             return {"success": True, "message": "Socio eliminado exitosamente"}
         else:
-            return {"success": False, "message": "Error al eliminar el socio"}
+            return {"success": False, "message": result.get("message", "Error al eliminar el socio")}
+    except SQLAlchemyError as e:
+        db.rollback()
+        return {"success": False, "message": f"Error de base de datos: {str(e)}"}
     except Exception as e:
-        return {"success": False, "message": f"Error: {str(e)}"}
+        return {"success": False, "message": f"Error inesperado: {str(e)}"}
 #=============================== PLANES S O C I A L E S ================================================
 
 # Mostrar formulario para crear un plan social
@@ -561,73 +603,196 @@ def logout(response: Response):
 #=============================== C O B R O S ================================================
 
 @router.get("/read_ingresos", response_class=HTMLResponse, tags=["Cobros"])
-async def show_ingresos_semanales(request: Request, db: Session = Depends(get_db)):
+async def mostrar_pagos_pendientes(
+    request: Request, 
+    mes: str = None,  # Recibe un parámetro en formato YYYY-MM
+    db: Session = Depends(get_db)
+):
     """
-    Muestra los socios con cobro pendiente esta semana en el template 'read_ingresos.html'.
+    Muestra los pagos pendientes para el mes y año especificados, 
+    actualizando las fechas según corresponda.
     """
-    today = datetime.now().date()
-    start_of_week = today - timedelta(days=today.weekday())  # Lunes de esta semana
-    end_of_week = start_of_week + timedelta(days=6)  # Domingo de esta semana
+    try:
+        # Obtener mes y año actuales si no se especifica
+        if not mes:
+            anio = datetime.now().year
+            mes_num = datetime.now().month
+        else:
+            anio, mes_num = map(int, mes.split("-"))
 
-    socios = crud.get_socios_cobro_semanal(db, start_of_week, end_of_week)
+        # Generar las fechas de inicio y fin del mes solicitado
+        fecha_inicio = date(anio, mes_num, 1)
+        fecha_fin = (fecha_inicio.replace(day=28) + timedelta(days=4)).replace(day=1) - timedelta(days=1)
 
-    if not socios:
-        print("No hay datos para mostrar en el template.")
-        socios_data = []
-    else:
-        print(f"Datos enviados al template ({len(socios)} registros):")
-        socios_data = []
-        for socio in socios:
-            fecha_cobro = socio.fecha_ingreso + timedelta(days=30)
-            print(f"Nombre: {socio.nombre}, Apellido: {socio.apellido}, Fecha Cobro: {fecha_cobro}")
-            socios_data.append({
-                "nombre": socio.nombre,
-                "apellido": socio.apellido,
-                "combo": socio.plan.nombre_plan if socio.plan else "Sin plan",
-                "precio": socio.plan.precio if socio.plan else 0,
-                "fecha_cobro": fecha_cobro.strftime('%Y-%m-%d')  # Formato amigable
-            })
+        print(f"Fecha inicio generada: {fecha_inicio}")
+        print(f"Fecha fin generada: {fecha_fin}")
 
-    return templates.TemplateResponse("read_ingresos.html", {
-        "request": request,
-        "socios": socios_data,
-        "start_of_week": start_of_week.strftime('%Y-%m-%d'),
-        "end_of_week": end_of_week.strftime('%Y-%m-%d')
-    })
+        # Consultar los pagos pendientes para el rango de fechas
+        pagos = crud.obtener_pagos_pendientes(db, fecha_inicio, fecha_fin)
+
+        
+        pagos_actualizados = [
+            {
+                "nombre": pago[0],
+                "apellido": pago[1],
+                "combo": pago[2],
+                "precio": pago[3],
+                "fecha_programada": pago[4].strftime("%Y-%m-%d") if pago[4] else None,
+                "fecha_pago": pago[5].strftime("%Y-%m-%d") if pago[5] else None,
+                "estado_pago": pago[6],
+                "id_pago": pago[7],
+            }
+            for pago in pagos
+            
+        ]
+        # Renderizar la plantilla con los datos actualizados
+        return templates.TemplateResponse(
+            "read_ingresos.html",
+            {
+                "request": request,
+                "cobros": pagos_actualizados,
+                "mes_actual": f"{anio}-{mes_num:02d}",
+            },
+        )
+    except Exception as e:
+        print(f"Error al mostrar pagos: {e}")
+        return JSONResponse(
+            status_code=500, 
+            content={"message": "Ocurrió un error al mostrar los pagos"}
+        )
+
+
+
+
 
 
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
-@router.get("/read_ingresosOLD", response_class=HTMLResponse, tags=["Cobros"])
-async def show_ingresos_semana_anterior(request: Request, db: Session = Depends(get_db)):
-    """
-    Muestra los socios con cobro pendiente la semana pasada en el template 'read_ingresosOLD.html'.
-    """
-    today = datetime.now().date()
-    start_of_last_week = today - timedelta(days=today.weekday() + 7)  # Lunes de la semana pasada
-    end_of_last_week = start_of_last_week + timedelta(days=6)  # Domingo de la semana pasada
-    
-    socios = crud.get_socios_cobro_semana_anterior(db)
 
-    if not socios:
-        print("No hay datos para mostrar en el template.")
-        socios_data = []
-    else:
-        print(f"Datos enviados al template ({len(socios)} registros):")
-        socios_data = []
-        for socio in socios:
-            fecha_cobro = socio.fecha_ingreso + timedelta(days=30)
-            print(f"Nombre: {socio.nombre}, Apellido: {socio.apellido}, Fecha Cobro: {fecha_cobro}")
-            socios_data.append({
-                "nombre": socio.nombre,
-                "apellido": socio.apellido,
-                "combo": socio.plan.nombre_plan if socio.plan else "Sin plan",
-                "precio": socio.plan.precio if socio.plan else 0,
-                "fecha_cobro": fecha_cobro.strftime('%Y-%m-%d')  # Formato amigable
-            })
 
-    return templates.TemplateResponse("read_ingresosOLD.html", {
-        "request": request,
-        "socios": socios_data,
-        "start_of_week": start_of_last_week.strftime('%Y-%m-%d'),
-        "end_of_week": end_of_last_week.strftime('%Y-%m-%d')
-    })
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+from datetime import date, timedelta
+
+
+@router.get("/cobros/actuales", response_class=JSONResponse, tags=["Cobros"])
+async def cobros_actuales(mes: str, db: Session = Depends(get_db)):
+    try:
+        # Extraer año y mes del parámetro `mes` (formato esperado: 'YYYY-MM')
+        anio, mes_num = map(int, mes.split("-"))
+
+        # Generar las fechas de inicio y fin
+        fecha_inicio = date(anio, mes_num, 1)
+        fecha_fin = (fecha_inicio.replace(day=28) + timedelta(days=4)).replace(day=1) - timedelta(days=1)
+
+        # Depuración
+        print(f"Fecha inicio: {fecha_inicio}, Fecha fin: {fecha_fin}")
+
+        # Consultar los cobros en el rango
+        cobros = crud.obtener_pagos_pendientes(db, fecha_inicio, fecha_fin)
+
+        cobros_json = [
+        {
+            "id_pago": c[7],  # Índice del id_pago en la consulta
+            "nombre": c[0],
+            "apellido": c[1],
+            "combo": c[2],
+            "precio": c[3],
+            "fecha_programada": c[4].strftime("%Y-%m-%d"),
+            "fecha_pago": c[5].strftime("%Y-%m-%d") if c[5] else None,
+            "estado_pago": c[6],
+        }
+        for c in cobros
+    ]
+        return {"success": True, "data": cobros_json}
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return {"success": False, "message": "Error al obtener cobros."}
+
+
+
+
+
+
+
+
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+
+@router.post("/procesar_actualizacion_pago", tags=["Cobros"])
+async def procesar_actualizacion_pago(
+    id_pago: int = Form(...),
+    fecha_pago: str = Form(...),
+    estado_pago: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    try:
+        # Actualizar el pago en la base de datos
+        pago = db.query(models.Pago).filter(models.Pago.id_pago == id_pago).first()
+
+        if not pago:
+            return JSONResponse(
+                status_code=404,
+                content={"message": f"No se encontró el pago con ID {id_pago}"}
+            )
+
+        # Actualizar campos
+        pago.fecha_pago = fecha_pago
+        pago.estado_pago = estado_pago
+        db.commit()
+
+        return RedirectResponse(url="/read_ingresos", status_code=303)
+    except Exception as e:
+        print(f"Error al actualizar pago: {e}")
+        return JSONResponse(
+            status_code=500,
+            content={"message": "Error al actualizar el pago"}
+        )
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+@router.get("/actualizar_pago/{id_pago}", response_class=HTMLResponse, tags=["Cobros"])
+async def mostrar_actualizar_pago(id_pago: int, request: Request, db: Session = Depends(get_db)):
+    try:
+        # Obtener los datos del pago por ID
+        pago = (
+            db.query(
+                models.Pago.id_pago,
+                models.Socio.nombre,
+                models.Socio.apellido,
+                models.Plan.nombre_plan.label("combo"),
+                models.Plan.precio,
+                models.Pago.fecha_programada,
+                models.Pago.fecha_pago,
+                models.Pago.estado_pago,
+            )
+            .join(models.Socio, models.Pago.id_socio == models.Socio.id_socio)
+            .join(models.Plan, models.Socio.id_plan == models.Plan.id_plan)
+            .filter(models.Pago.id_pago == id_pago)
+            .first()
+        )
+
+        if not pago:
+            return JSONResponse(
+                status_code=404,
+                content={"message": f"No se encontró el pago con ID {id_pago}"}
+            )
+
+        # Renderizar el template con los datos del pago
+        return templates.TemplateResponse(
+            "actualizar_pago.html",
+            {
+                "request": request,
+                "pago": {
+                    "id_pago": pago.id_pago,
+                    "nombre": pago.nombre,
+                    "apellido": pago.apellido,
+                    "combo": pago.combo,
+                    "precio": pago.precio,
+                    "fecha_programada": pago.fecha_programada.strftime("%Y-%m-%d"),
+                    "fecha_pago": pago.fecha_pago.strftime("%Y-%m-%d") if pago.fecha_pago else "",
+                    "estado_pago": pago.estado_pago,
+                },
+            },
+        )
+    except Exception as e:
+        print(f"Error al mostrar formulario de actualización: {e}")
+        return JSONResponse(
+            status_code=500,
+            content={"message": "Error al mostrar el formulario de actualización"}
+        )

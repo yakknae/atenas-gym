@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actualizar Pago</title>
+    <link rel="stylesheet" href="/static/crear.css">
+</head>
+<body>
+    <div>
+        <nav>
+            <ul>
+                <li><a href="/index">Inicio</a></li>
+                <li><a href="/read_ingresos">Ver Pagos</a></li>
+            </ul>
+            <h1>Actualizar Pago</h1>
+        </nav>
+    </div>
+
+    {% if pago %}
+    <div class="form-container">
+        <form action="/procesar_actualizacion_pago" method="post">
+            <!-- ID del pago (oculto) -->
+            <input type="hidden" name="id_pago" value="{{ pago.id_pago }}" />
+
+            <!-- Campos de solo lectura -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="nombre">Nombre:</label>
+                    <input type="text" id="nombre" name="nombre" value="{{ pago.nombre }}" readonly />
+                </div>
+
+                <div class="form-group">
+                    <label for="apellido">Apellido:</label>
+                    <input type="text" id="apellido" name="apellido" value="{{ pago.apellido }}" readonly />
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="combo">Combo:</label>
+                    <input type="text" id="combo" name="combo" value="{{ pago.combo }}" readonly />
+                </div>
+
+                <div class="form-group">
+                    <label for="precio">Precio:</label>
+                    <input type="text" id="precio" name="precio" value="${{ pago.precio }}" readonly />
+                </div>
+            </div>
+            <div class="form-group">
+              <label for="fecha_programada">Fecha Programada:</label>
+              <input type="text" id="fecha_programada" name="fecha_programada" value="{{ pago.fecha_programada }}" readonly />
+          </div>
+
+            <!-- Campos editables -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="fecha_pago">Fecha de Pago:</label>
+                    <input type="date" id="fecha_pago" name="fecha_pago" required value="{{ pago.fecha_pago }}" />
+                </div>
+
+                <div class="form-group">
+                    <label for="estado_pago">Estado:</label>
+                    <select id="estado_pago" name="estado_pago" required>
+                        <option value="Pagado" {% if pago.estado_pago == "Pagado" %}selected{% endif %}>Pagado</option>
+                        <option value="Pendiente" {% if pago.estado_pago == "Pendiente" %}selected{% endif %}>Pendiente</option>
+                    </select>
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <button type="submit">Actualizar Pago</button>
+            </div>
+        </form>
+    </div>
+    {% else %}
+        <p>No se ha encontrado el pago o el ID es incorrecto.</p>
+    {% endif %}
+
+    <div class="background-image"></div>
+
+    {% if message %}
+    <div class="message-container">
+        <p class="message">{{ message }}</p>
+    </div>
+    {% endif %}
+</body>
+</html>

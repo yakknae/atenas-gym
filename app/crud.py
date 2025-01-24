@@ -1,30 +1,31 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from app import models, schemas
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime, time
 import logging
 from fastapi import Request
-from datetime import time
-from sqlalchemy import or_ , text , func
+from sqlalchemy import or_
 
 
 
 #=============================== S O C I O S ================================================
 def create_socio(db: Session, socio: schemas.SocioCreate):
-    db_socio = models.Socio(**socio.dict())
+    # Crear un nuevo socio en la base de datos a partir del objeto `SocioCreate`
+    db_socio = models.Socio(**socio.dict())  # Usa el modelo de la base de datos
     db.add(db_socio)
     db.commit()
-    db.refresh(db_socio)
+    db.refresh(db_socio)  # Recuperar el objeto con el ID autogenerado
     return db_socio
 
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
 def get_socios(db: Session):
-    return db.query(models.Socio).all()
+    return db.query(models.Socio).options(joinedload(models.Socio.pagos)).all()
 
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
 def get_socio(db: Session, socio_id: int):
-    return db.query(models.Socio).filter(models.Socio.id_socio == socio_id).first()
+    return db.query(models.Socio).options(joinedload(models.Socio.pagos)).filter(models.Socio.id_socio == socio_id).first()
+
 
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
@@ -42,22 +43,22 @@ def update_socio(db: Session, socio_id: int, socio_update: schemas.SocioUpdate):
 
 def delete_socio(db: Session, socio_id: int) -> dict:
     try:
+        # Eliminar los pagos asociados
+        db.query(models.Pago).filter(models.Pago.id_socio == socio_id).delete()
+        db.commit()
+
+        # Ahora eliminar el socio
         socio = db.query(models.Socio).filter(models.Socio.id_socio == socio_id).first()
         if not socio:
-            print(f"Socio con ID {socio_id} no encontrado.")
             return {"status": "error", "message": "Socio no encontrado"}
         
-        print(f"Socio encontrado: {socio}")
         db.delete(socio)
         db.commit()
-        print(f"Socio con ID {socio_id} eliminado exitosamente.")
+
         return {"status": "success"}
     except Exception as e:
-        print(f"Error al eliminar el socio: {str(e)}")
         db.rollback()
         return {"status": "error", "message": f"Error al eliminar: {str(e)}"}
-
-
 #=============================== PLANES S O C I A L E S ================================================
 
 def get_plan_social(db: Session, plan_social_id: int):
@@ -249,29 +250,43 @@ def convert_to_string(hour: time):
 
 
 #=============================== C O B R O S ================================================
+# Actualización de la función `obtener_pagos_pendientes` para trabajar con el tipo `Date`
+def obtener_pagos_pendientes(db: Session, fecha_inicio: date, fecha_fin: date):
+    """
+    Obtiene los pagos pendientes para el rango de fechas especificado.
+    """
+    try:
+        # Mostrar las fechas para depuración
+        print(f"Fecha inicio en la consulta: {fecha_inicio}")
+        print(f"Fecha fin en la consulta: {fecha_fin}")
 
-def get_socios_cobro_semanal(db: Session, start_of_week: date, end_of_week: date):
-    """
-    Obtiene los socios cuya fecha de cobro (fecha_ingreso + 30 días) cae en el rango de la semana actual.
-    """
-    socios = (
-        db.query(models.Socio)
-        .filter(
-            models.Socio.fecha_ingreso.isnot(None),
-            func.date_add(models.Socio.fecha_ingreso, text("INTERVAL 30 DAY")) >= start_of_week,
-            func.date_add(models.Socio.fecha_ingreso, text("INTERVAL 30 DAY")) <= end_of_week,
+        # Aplicar filtros de rango de fechas en la consulta
+        pagos = (
+            db.query(
+                models.Socio.nombre,
+                models.Socio.apellido,
+                models.Plan.nombre_plan.label("combo"),
+                models.Plan.precio,
+                models.Pago.fecha_programada,
+                models.Pago.fecha_pago,
+                models.Pago.estado_pago,
+                models.Pago.id_pago
+            )
+            .join(models.Plan, models.Socio.id_plan == models.Plan.id_plan)
+            .join(models.Pago, models.Socio.id_socio == models.Pago.id_socio)
+            .filter(models.Pago.fecha_programada >= fecha_inicio)  # Filtro de fecha de inicio
+            .filter(models.Pago.fecha_programada <= fecha_fin)    # Filtro de fecha de fin
+            .all()
         )
-        .all()
-    )
 
-    # Log para depuración
-    print(f"Socios encontrados para el rango {start_of_week} - {end_of_week} ({len(socios)} registros):")
-    for socio in socios:
-        fecha_cobro = socio.fecha_ingreso + timedelta(days=30)
-        print(f"Nombre: {socio.nombre}, Apellido: {socio.apellido}, Fecha Cobro: {fecha_cobro}")
+        if not pagos:
+            print(f"No se encontraron pagos pendientes para el rango de fechas {fecha_inicio} a {fecha_fin}.")
+        
+        return pagos
 
-    return socios
-
+    except Exception as e:
+        print(f"Error al obtener pagos pendientes: {e}")
+        return []
 
 
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
@@ -290,46 +305,46 @@ def calcular_fechas_cobro(fecha_ingreso, fecha_actual):
     return fechas_cobro
 
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
-def filtrar_fechas_semana_actual(fechas_cobro, start_of_week, end_of_week):
-    """
-    Filtra las fechas de cobro que caen dentro de la semana actual.
-    """
-    return [fecha for fecha in fechas_cobro if start_of_week <= fecha <= end_of_week]
+
 
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
-def get_socios_cobro_semana_anterior(db: Session):
-    """
-    Obtiene los socios cuya fecha de cobro (fecha_ingreso + múltiplos de 30 días) cayó en la semana anterior.
-    """
-    today = date.today()
-    start_of_last_week = today - timedelta(days=today.weekday() + 7)  # Lunes de la semana pasada
-    end_of_last_week = start_of_last_week + timedelta(days=6)  # Domingo de la semana pasada
 
-    # Consulta ajustada para incluir fechas acumulativas de cobro
-    socios = (
-        db.query(models.Socio)
-        .filter(
-            models.Socio.fecha_ingreso.isnot(None),
-            func.date_add(
-                models.Socio.fecha_ingreso, 
-                text("INTERVAL 30 * FLOOR(DATEDIFF(:start_date, fecha_ingreso) / 30) DAY")
-            ) >= start_of_last_week,
-            func.date_add(
-                models.Socio.fecha_ingreso, 
-                text("INTERVAL 30 * FLOOR(DATEDIFF(:start_date, fecha_ingreso) / 30) DAY")
-            ) <= end_of_last_week,
-        )
-        .params(start_date=end_of_last_week)  # Pasamos el parámetro para la consulta SQL
-        .all()
+#=============================== P A G O S ================================================
+def create_pago(db: Session, id_socio: int, id_plan: int, fecha_pago: str):
+    # Crear un nuevo pago para el socio
+    db_pago = schemas.Pago(
+        id_socio=id_socio,
+        id_plan=id_plan,
+        fecha_programada=fecha_pago,  # Este será el primer día del mes
+        fecha_pago=None,  # Este campo estará vacío hasta que el pago se realice
+        estado_pago='Pendiente',  # El estado inicial del pago es 'Pendiente'
+        mes_correspondiente=fecha_pago  # El mes correspondiente al pago
     )
+    db.add(db_pago)
+    db.commit()
+    db.refresh(db_pago)
+    return db_pago
 
-    # Log para depuración
-    print(f"Socios encontrados para la semana anterior ({len(socios)} registros):")
-    for socio in socios:
-        # Calculamos la fecha de cobro acumulativa
-        dias_transcurridos = (start_of_last_week - socio.fecha_ingreso).days
-        ciclos_completos = dias_transcurridos // 30
-        fecha_cobro = socio.fecha_ingreso + timedelta(days=30 * ciclos_completos)
-        print(f"Nombre: {socio.nombre}, Apellido: {socio.apellido}, Fecha Cobro: {fecha_cobro}")
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+# CRUD para obtener un pago
+def get_pago(db: Session, id_pago: int):
+    return db.query(models.Pago).filter(models.Pago.id_pago == id_pago).first()
 
-    return socios
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+
+def actualizar_cobro(db: Session, id_pago: int, fecha_pago: str):
+    pago = get_pago(db, id_pago)
+    if not pago:
+        return None
+    pago.fecha_pago = fecha_pago
+    pago.estado_pago = "Pagado"
+    db.commit()
+    return pago
+
+
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+
+def get_all_pagos(db: Session):
+    return db.query(models.Pago).all()
+
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//

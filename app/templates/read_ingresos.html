@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ingresos Semanales</title>
+    <title>Ingresos Mensuales</title>
     <link rel="stylesheet" href="/static/planilla.css" />
   </head>
   <body>
@@ -11,41 +11,119 @@
       <nav>
         <ul>
           <li><a href="/index">Inicio</a></li>
-          <li><a href="/read_ingresosOLD">Cobros semana Pasada</a></li>
         </ul>
-        <h1>Lista de cobros s.actual</h1>
+        <h1>Lista de cobros del mes</h1>
       </nav>
     </div>
 
-    <!-- Mensaje de éxito (si existe) -->
-    {% if message %}
-    <div id="messageContainer" class="message-container" style="display: none"></div>
-    {% endif %}
+    <!-- Selector de Mes -->
+    <form method="GET" action="read_ingresos">
+      <label for="mes">Seleccionar Mes:</label>
+      <input type="month" id="mes" name="mes" value="{{ mes_actual }}" />
+      <button type="submit">Filtrar</button>
+    </form>
 
-    <table class="ingresos-table">
+    <!-- Mensaje de éxito o error -->
+    <div id="messageContainer" class="message-container" style="display: none"></div>
+
+    <table>
       <thead>
         <tr>
+          <th>ID</th>
           <th>Nombre</th>
           <th>Apellido</th>
           <th>Combo</th>
           <th>Precio</th>
-          <th>Fec. cobro</th>
+          <th>Fecha Programada</th>
+          <th>Fecha Pago</th>
+          <th>Estado</th>
+          <th>Acción</th>
         </tr>
       </thead>
       <tbody>
-        {% for socio in socios %}
+        {% for cobro in cobros %}
         <tr>
-          <td>{{ socio.nombre }}</td>
-          <td>{{ socio.apellido }}</td>
-          <td>{{ socio.combo}}</td>
-          <td>${{ socio.precio}}</td>
-          <td>{{ socio.fecha_cobro }}</td>
+          <td>{{ cobro.id_pago }}</td>
+          <td>{{ cobro.nombre }}</td>
+          <td>{{ cobro.apellido }}</td>
+          <td>{{ cobro.combo }}</td>
+          <td>{{ cobro.precio }}</td>
+          <td>{{ cobro.fecha_programada }}</td>
+          <td>{{ cobro.fecha_pago if cobro.fecha_pago else 'No pagado' }}</td>
+          <td>
+            <span
+              id="estado_pago_{{ cobro.id_pago }}"
+              class="{{ 'pagado' if cobro.estado_pago == 'Pagado' else 'pendiente' }}"
+            >
+              {{ "Pagado" if cobro.estado_pago == 'Pagado' else "Pendiente" }}
+            </span>
+          </td>
+          <td>
+            <a href="/actualizar_pago/{{ cobro.id_pago }}">
+              <button>Actualizar</button>
+            </a>
+          </td>
         </tr>
+
         {% endfor %}
       </tbody>
     </table>
-    <div>
-      <h2>Rango de Cobros: {{ start_of_week }} hasta {{ end_of_week }}</h2>
-    </div>
+
+    <script>
+      function actualizarCobro(idCobro) {
+        // Obtener el valor de la fecha de pago desde el campo de entrada
+        const fechaPagoInput = document.getElementById(`fecha_pago_${idCobro}`);
+        const fechaPago = fechaPagoInput ? fechaPagoInput.value : "";
+
+        // Validación de la fecha de pago
+        if (!fechaPago) {
+          alert("Por favor complete la fecha de pago.");
+          return;
+        }
+
+        // Enviar la solicitud a la nueva ruta
+        fetch(`/actualizar_pago/${idCobro}`, {
+          method: "GET",
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              // Mostrar el formulario para actualizar la fecha de pago
+              const formContainer = document.getElementById("formulario_actualizacion");
+              formContainer.innerHTML = `
+                <h2>Actualizar Pago</h2>
+                <form id="formActualizarPago">
+                  <label for="fecha_pago">Fecha de Pago:</label>
+                  <input type="date" id="fecha_pago" name="fecha_pago" required>
+                  <input type="hidden" id="id_pago" value="${idCobro}">
+                  <button type="submit">Actualizar</button>
+                </form>
+              `;
+            } else {
+              alert("Error al obtener el formulario para actualizar el pago.");
+            }
+          })
+          .catch((error) => {
+            console.error("Error al intentar obtener el formulario:", error);
+            alert("Error al obtener el formulario para actualizar el pago.");
+          });
+      }
+    </script>
+
+    <style>
+      .message-container {
+        margin: 10px 0;
+        padding: 10px;
+        border-radius: 5px;
+      }
+      .pagado {
+        color: green;
+        font-weight: bold;
+      }
+      .pendiente {
+        color: red;
+        font-weight: bold;
+      }
+    </style>
   </body>
 </html>
