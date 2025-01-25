@@ -184,10 +184,3 @@ h1 {
   background-position: center;
   z-index: -10; /* Por debajo del contenido */
 }
-
-#mes {
-  color: white;
-  background: #474747;
-  border: none;
-  border-radius: 20px;
-}

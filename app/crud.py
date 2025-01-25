@@ -15,7 +15,6 @@ def create_socio(db: Session, socio: schemas.SocioCreate):
     db.commit()
     db.refresh(db_socio)  # Recuperar el objeto con el ID autogenerado
     return db_socio
-
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
 def get_socios(db: Session):
@@ -310,21 +309,12 @@ def calcular_fechas_cobro(fecha_ingreso, fecha_actual):
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
 #=============================== P A G O S ================================================
-def create_pago(db: Session, id_socio: int, id_plan: int, fecha_pago: str):
-    # Crear un nuevo pago para el socio
-    db_pago = schemas.Pago(
-        id_socio=id_socio,
-        id_plan=id_plan,
-        fecha_programada=fecha_pago,  # Este será el primer día del mes
-        fecha_pago=None,  # Este campo estará vacío hasta que el pago se realice
-        estado_pago='Pendiente',  # El estado inicial del pago es 'Pendiente'
-        mes_correspondiente=fecha_pago  # El mes correspondiente al pago
-    )
+def create_pago(db: Session, pago_data: schemas.PagoCreate):
+    db_pago = models.Pago(**pago_data.dict())
     db.add(db_pago)
     db.commit()
     db.refresh(db_pago)
     return db_pago
-
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 # CRUD para obtener un pago
 def get_pago(db: Session, id_pago: int):

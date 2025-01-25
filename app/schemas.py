@@ -131,7 +131,6 @@ class Config:
 
 #=============================== P A G O S ================================================
 class PagoBase(BaseModel):
-    id_pago: int
     id_socio: int
     id_plan: int
     fecha_programada: date
@@ -145,11 +144,12 @@ class PagoCreate(PagoBase):
 class PagoUpdate(PagoBase):
     pass
 
-class Pago(PagoBase): 
-    id: int  
+class Pago(PagoBase):
+    id_pago: int 
 
     class Config:
         from_attributes = True
+
 
 #===============================================================================
 class Respuesta(BaseModel):

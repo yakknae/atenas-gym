@@ -10,7 +10,8 @@ from fastapi import Query
 from typing import List
 from datetime import datetime, timedelta
 from sqlalchemy.exc import IntegrityError
-
+from app import models
+from dateutil.relativedelta import relativedelta
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -47,9 +48,7 @@ async def show_create_socio_form(request: Request, db: Session = Depends(get_db)
     })
 
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
-from app import models
 
-# Crear un socio (POST)
 # Crear un socio (POST)
 @router.post("/crear_socio", response_class=HTMLResponse, tags=["Socios"])
 async def create_socio(
@@ -97,9 +96,18 @@ async def create_socio(
 
         # Crear los pagos para el socio, separados por mes
         fecha_programada_date = datetime.strptime(fecha_programada, '%Y-%m-%d')
-        for mes in range(1, 13):  # Crear pagos para 12 meses
-            fecha_pago = datetime(fecha_programada_date.year, mes, 1)  # Primer día de cada mes
-            crud.create_pago(db, db_socio.id_socio, id_plan, fecha_pago.strftime('%Y-%m-%d'))
+        for mes in range(12):  # Crear pagos para los 12 meses
+            # Calcular la fecha programada ajustada al mismo día de los meses siguientes
+            fecha_pago = fecha_programada_date + relativedelta(months=mes)
+            
+            # Crear el esquema para el pago
+            pago_data = schemas.PagoCreate(
+                id_socio=db_socio.id_socio,
+                id_plan=id_plan,
+                fecha_programada=fecha_pago.strftime('%Y-%m-%d'),
+                mes_correspondiente=fecha_pago.strftime('%Y-%m-%d')
+            )
+            crud.create_pago(db, pago_data)
 
         message = "Socio creado exitosamente."
     except IntegrityError as e:
