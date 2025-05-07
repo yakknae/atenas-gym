@@ -19,24 +19,13 @@
 
 ## Requisitos
 
-### Antes de ejecutar el proyecto, asegúrate de tener instalado lo siguiente:
-
-- Python 3.8 o superior.
-- MySQL Server configurado y en funcionamiento.
-- Un editor de texto o IDE (por ejemplo, VS Code).
-
 ## Instalación
 
 - Instalar dependencias
 
   > pip install -r requirements.txt
 
-- Configurar credenciales
-- Crea un archivo .env en la raíz del proyecto y añade las siguientes variables de entorno con tus credenciales de MySQL:
-
 ## Configurar la base de datos
-
-- El archivo database.py ya no se utiliza. Ahora, usa database1.py para configurar la base de datos inicial.
 
 > python -m app.database1
 
@@ -45,8 +34,6 @@
 ## Iniciar el servidor
 
 > uvicorn app.main:app --reload
-
-- El servidor estará disponible en http://127.0.0.1:8000.
 
 ## Detener el servidor
 - Para detener el servidor, presiona `CTRL+C` en la terminal donde se está ejecutando.
