@@ -71,6 +71,11 @@ form {
   background-color: #2a2a2a;
   color: #e0e0e0;
 }
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #fc4500;
+}
 
 #socio {
   padding: 12px;
@@ -177,18 +182,21 @@ h1 {
   color: white; /* Color del texto */
   border: 1px solid #444; /* Opcional: color del borde */
   padding: 10px; /* Opcional: espacio interno */
-  width: 100%; /* Opcional: ancho completo */
   height: 100px; /* Opcional: altura */
   resize: none; /* Opcional: desactivar el redimensionamiento */
 }
-
+#descripcion:focus,
+#descripcion:hover {
+  border-color: #fc4500;
+}
 .background-image {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100vh; /* Se ajusta a la altura de la ventana */
-  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("assets/fondo.png");
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    url("/static/assets/fondo.png");
   background-size: cover;
   background-position: center;
   z-index: -10; /* Por debajo del contenido */

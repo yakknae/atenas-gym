@@ -1,5 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap");
-
+* {
+  cursor: url(/static/assets/cursorWhite.png) 16 16, auto !important;
+}
 body {
   font-family: "Poppins", sans-serif;
   background-color: #121212;
@@ -292,4 +294,7 @@ input[type="month" i] {
   background: #474747;
   border: none;
   border-radius: 25px;
+  text-align: center;
+  padding: 5px;
+  margin: 0px 10px 0px 10px;
 }

@@ -103,6 +103,7 @@ form {
   width: 960px;
   margin: 0 auto; /* Centra el formulario horizontalmente */
   margin-top: 20px;
+  transform: translatey(340px);
 }
 
 .form-group {
@@ -229,7 +230,8 @@ h1 {
   left: 0;
   width: 100%;
   height: 100vh; /* Se ajusta a la altura de la ventana */
-  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("assets/fondo.png");
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    url("/static/assets/fondo.png");
   background-size: cover;
   background-position: center;
   z-index: -10; /* Por debajo del contenido */
@@ -241,18 +243,6 @@ h1 {
 
 #month {
   width: 100px;
-}
-
-.background-image {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh; /* Se ajusta a la altura de la ventana */
-  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("assets/fondo.png");
-  background-size: cover;
-  background-position: center;
-  z-index: -10; /* Por debajo del contenido */
 }
 
 thead {
