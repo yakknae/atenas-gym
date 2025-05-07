@@ -64,6 +64,7 @@ async def create_socio(
     fecha_programada: str = Form(...),  # Esto es para la fecha de pago
     id_plan: int = Form(...),  # Asegúrate de que id_plan no sea None
     id_plan_social: int = Form(None),
+    estado: str =Form(None),
     db: Session = Depends(get_db)
 ):
     try:
@@ -91,12 +92,13 @@ async def create_socio(
             direccion=direccion,
             id_plan=id_plan,  # Asegurarse de que el plan no sea None
             id_plan_social=id_plan_social,
+            estado=estado
         )
         db_socio = crud.create_socio(db, socio_data)
 
         # Crear los pagos para el socio, separados por mes
         fecha_programada_date = datetime.strptime(fecha_programada, '%Y-%m-%d')
-        for mes in range(12):  # Crear pagos para los 12 meses
+        for mes in range(12): 
             # Calcular la fecha programada ajustada al mismo día de los meses siguientes
             fecha_pago = fecha_programada_date + relativedelta(months=mes)
             
@@ -120,12 +122,6 @@ async def create_socio(
     # Redirigir a la misma página después de crear el socio
     url = str(request.url_for("show_create_socio_form"))
     return RedirectResponse(url=f"{url}?message={message}", status_code=303)
-
-
-
-
-
-
 
 
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
@@ -221,6 +217,7 @@ async def guardar_actualizacion(
     id_plan: int = Form(...),
     id_plan_social: int = Form(...),
     socio_id: int = Form(...),
+    estado: str = Form(...),
     db: Session = Depends(get_db),
 ):
     """
@@ -255,6 +252,7 @@ async def guardar_actualizacion(
     socio.direccion = direccion
     socio.id_plan = id_plan
     socio.id_plan_social = id_plan_social
+    socio.estado = estado
 
     db.commit()  # Guardar cambios en la base de datos
     db.refresh(socio)  # Refrescar los datos del socio

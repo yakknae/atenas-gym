@@ -1,0 +1,45 @@
+# Entorno virtual de Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+
+# Archivos de logs y caché
+*.log
+.cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Configuración local y variables de entorno
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Paquetes de Python
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+sdist/
+wheels/
+pip-wheel-metadata/
+
+# IDE / Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# Sistema operativo
+.DS_Store
+Thumbs.db

@@ -13,7 +13,14 @@ body {
   align-items: center;
   margin: 0;
 }
-
+::selection {
+  background-color: #fc4500; /* Color de fondo al seleccionar */
+  color: #ffffff; /* Color del texto al seleccionar */
+}
+.form-group input ::selection {
+  background-color: #fc4500; /* Color de fondo al seleccionar */
+  color: #ffffff;
+}
 .login-container {
   background-color: #222;
   padding: 30px;

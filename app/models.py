@@ -37,7 +37,7 @@ class Socio(Base):
     direccion = Column(String(255))
     id_plan = Column(Integer, ForeignKey('planes.id_plan'))
     id_plan_social = Column(Integer, ForeignKey('planes_sociales.id_plan_social'))
-
+    estado = Column(String(20))
     # Relaciones
     plan = relationship("Plan", back_populates="socios")
     plan_social = relationship("PlanSocial", back_populates="socios")

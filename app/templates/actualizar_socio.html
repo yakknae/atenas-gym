@@ -10,8 +10,8 @@
     <div>
         <nav>
             <ul>
-                <li><a href="/index">Inicio</a></li>
-                <li><a href="/read_socios">Ver Socios</a></li>
+                <li><a href="/index" draggable="false">Inicio</a></li>
+                <li><a href="/read_socios" draggable="false">Ver Socios</a></li>
             </ul>
             <h1>Actualizar Socio</h1>
         </nav>
@@ -21,7 +21,7 @@
     <div class="form-container">
         <form action="/guardar_actualizacion" method="post">
             <input type="hidden" name="socio_id" value="{{ socio.id_socio }}" />
-
+<!--primera fila-->
             <div class="form-row">
                 <div class="form-group">
                     <label for="nombre">Nombre:</label>
@@ -32,7 +32,7 @@
                     <input type="text" id="apellido" name="apellido" required value="{{ socio.apellido }}" />
                 </div>
             </div>
-
+<!--segunda fila-->
             <div class="form-row">
                 <div class="form-group">
                     <label for="dni">DNI:</label>
@@ -43,7 +43,7 @@
                     <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required value="{{ socio.fecha_nacimiento }}" />
                 </div>
             </div>
-
+<!--tercera fila-->
             <div class="form-row">
                 <div class="form-group">
                     <label for="genero">Género:</label>
@@ -57,7 +57,7 @@
                     <input type="email" id="email" name="email" required value="{{ socio.email }}" />
                 </div>
             </div>
-
+<!--cuarta fila-->
             <div class="form-row">
                 <div class="form-group">
                     <label for="telefono">Teléfono:</label>
@@ -68,7 +68,7 @@
                     <input type="text" id="direccion" name="direccion" required value="{{ socio.direccion }}" />
                 </div>
             </div>
-
+<!--quinta fila-->
             <div class="form-row">
                 <div class="form-group">
                     <label for="fecha_ingreso">Fecha de ingreso:</label>
@@ -80,18 +80,14 @@
                     {% endif %}
                 </div>
                 <div class="form-group">
-                    <label for="id_plan">Plan:</label>
-                    <select id="id_plan" name="id_plan" required>
-                        <option value="" disabled>Seleccionar plan</option>
-                        {% for plan in planes %}
-                            <option value="{{ plan.id_plan }}" {% if socio.id_plan == plan.id_plan %}selected{% endif %}>
-                                {{ plan.nombre_plan }}
-                            </option>
-                        {% endfor %}
+                    <label for="estado">Estado:</label>
+                    <select id="estado" name="estado" required>
+                        <option value="Activo" {% if socio.estado == 'Activo' %}selected{% endif %}>Activo</option>
+                        <option value="Inactivo" {% if socio.estado == 'Inactivo' %}selected{% endif %}>Inactivo</option>
                     </select>
                 </div>
             </div>
-
+<!--sexta fila-->
             <div class="form-row">
                 <div class="form-group">
                     <label for="id_plan_social">Seguro médico:</label>
@@ -100,6 +96,17 @@
                         {% for plan_social in planes_sociales %}
                             <option value="{{ plan_social.id_plan_social }}" {% if socio.id_plan_social == plan_social.id_plan_social %}selected{% endif %}>
                                 {{ plan_social.nombre_plan_social }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="id_plan">Plan:</label>
+                    <select id="id_plan" name="id_plan" required>
+                        <option value="" disabled>Seleccionar plan</option>
+                        {% for plan in planes %}
+                            <option value="{{ plan.id_plan }}" {% if socio.id_plan == plan.id_plan %}selected{% endif %}>
+                                {{ plan.nombre_plan }}
                             </option>
                         {% endfor %}
                     </select>

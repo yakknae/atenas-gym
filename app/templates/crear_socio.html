@@ -51,8 +51,8 @@
     <div>
       <nav>
         <ul>
-          <li><a href="/index">Inicio</a></li>
-          <li><a href="/read_socios">Ver Socios</a></li>
+          <li><a href="/index" draggable="false">Inicio</a></li>
+          <li><a href="/read_socios" draggable="false">Ver Socios</a></li>
         </ul>
         <h1>Registrar Nuevo Socio</h1>
       </nav>
@@ -80,11 +80,18 @@
           <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required />
         </div>
 
-        <div class="form-group full-width">
+        <div class="form-group">
           <label for="genero">Género:</label>
           <select id="genero" name="genero" required>
             <option value="Hombre">Hombre</option>
             <option value="Mujer">Mujer</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="genero">Estado:</label>
+          <select id="genero" name="genero" required>
+            <option value="Activo">Activo</option>
+            <option value="Inactivo">Inactivo</option>
           </select>
         </div>
 
@@ -123,7 +130,9 @@
           <select id="id_plan_social" name="id_plan_social" required>
             <option value="" disabled selected>Seleccionar plan social</option>
             {% for plan_social in planes_sociales %}
-            <option value="{{ plan_social.id_plan_social }}">{{ plan_social.nombre_plan_social }}</option>
+            <option value="{{ plan_social.id_plan_social }}">
+              {{ plan_social.nombre_plan_social }}
+            </option>
             {% endfor %}
           </select>
         </div>
@@ -140,56 +149,6 @@
     </div>
     {% endif %}
 
-    <script>
-      function validarFormulario() {
-        const dni = document.getElementById("dni").value;
-        const email = document.getElementById("email").value;
-        const telefono = document.getElementById("telefono").value;
-        const direccion = document.getElementById("direccion").value;
-        const fechaNacimiento = new Date(document.getElementById("fecha_nacimiento").value);
-        const hoy = new Date();
-
-        // Validación del email
-        if (!email.includes("@") || !email.includes(".")) {
-          alert("Por favor, ingresa un email válido.");
-          return false;
-        }
-
-        // Validación del DNI
-        if (dni.length < 7 || dni.length > 8 || isNaN(dni)) {
-          alert("El DNI debe ser un número válido de 7 u 8 dígitos.");
-          return false;
-        }
-
-        // Validación del teléfono
-        if (telefono.length < 8 || telefono.length > 15 || isNaN(telefono)) {
-          alert("El número de teléfono debe ser válido y tener entre 8 y 15 dígitos.");
-          return false;
-        }
-
-        // Validación de la dirección
-        if (direccion.length < 5) {
-          alert("La dirección debe contener al menos 5 caracteres.");
-          return false;
-        }
-
-        // Validación de la fecha de nacimiento
-        if (fechaNacimiento > hoy) {
-          alert("La fecha de nacimiento no puede ser una fecha futura.");
-          return false;
-        }
-
-        return true;
-      }
-
-      // Asociar la validación al formulario
-      document.getElementById("socioForm").onsubmit = function () {
-        return validarFormulario();
-      };
-
-      function disableButton() {
-        document.getElementById("submitButton").disabled = true;
-      }
-    </script>
+    <script src="/static/scripts/crear_socio.js"></script>
   </body>
 </html>

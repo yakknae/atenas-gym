@@ -12,10 +12,19 @@ body {
   height: 100vh;
 }
 
+::selection {
+  background-color: #fc4500; /* Color de fondo al seleccionar */
+  color: #ffffff; /* Color del texto al seleccionar */
+}
+.form-group input ::selection {
+  background-color: #fc4500; /* Color de fondo al seleccionar */
+  color: #ffffff;
+}
 h1 {
   margin: 0;
   font-size: 2.5em;
   font-weight: 600;
+  user-select: none;
 }
 
 table {
@@ -29,6 +38,10 @@ td {
   padding: 12px;
   text-align: left;
   border-bottom: 1px solid #fc4500;
+  text-align: center;
+}
+th {
+  user-select: none;
 }
 
 th {

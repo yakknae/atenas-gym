@@ -10,8 +10,8 @@
     <div>
       <nav>
         <ul>
-          <li><a href="/index">Inicio</a></li>
-          <li><a href="/crear_socio">Crear Socio</a></li>
+          <li><a href="/index" draggable="false">Inicio</a></li>
+          <li><a href="/crear_socio" draggable="false">Crear Socio</a></li>
         </ul>
         <h1>Lista de Socios</h1>
       </nav>
@@ -25,7 +25,7 @@
     <table>
       <thead>
         <tr>
-          <th>ID</th>
+          <th></th>
           <th id="orden-tabla" data-sort="nombre" onclick="ordenarTabla('nombre')">Nombre</th>
           <th id="orden-tabla" data-sort="apellido" onclick="ordenarTabla('apellido')">Apellido</th>
           <th>DNI</th>
@@ -43,7 +43,7 @@
       <tbody id="socios-table-body">
         {% for socio in socios %}
         <tr id="socio-{{ socio.id_socio }}">
-          <td>{{ socio.id_socio }}</td>
+          <td class="indice"></td>
           <td>{{ socio.nombre }}</td>
           <td>{{ socio.apellido }}</td>
           <td>{{ socio.dni }}</td>
@@ -53,13 +53,16 @@
           <td>{{ socio.telefono }}</td>
           <td>{{ socio.direccion }}</td>
           <td>
-            {% if socio.pagos %} {% set primer_pago = socio.pagos[0] %} {# Asignamos el primer pago al socio #}
+            {% if socio.pagos %} {% set primer_pago = socio.pagos[0] %} {# Asignamos el primer pago
+            al socio #}
             <div>{{ primer_pago.fecha_programada }}</div>
             <!-- Solo mostrar la fecha de ingreso del primer pago -->
             {% else %} Sin pagos registrados {% endif %}
           </td>
           <td>{{ socio.plan.nombre_plan if socio.plan else 'Sin Plan' }}</td>
-          <td>{{ socio.plan_social.nombre_plan_social if socio.plan_social else 'Sin Plan Social' }}</td>
+          <td>
+            {{ socio.plan_social.nombre_plan_social if socio.plan_social else 'Sin Plan Social' }}
+          </td>
           <td>
             <button onclick="showDeleteForm('{{ socio.id_socio }}')">Eliminar</button>
             <form action="/actualizar_socio" method="post" style="display: inline">
@@ -88,71 +91,7 @@
       </form>
     </div>
 
-    <script>
-      function showDeleteForm(id) {
-        document.getElementById("deleteId").value = id;
-        document.getElementById("deleteForm").style.display = "block";
-      }
-
-      function hideDeleteForm() {
-        document.getElementById("deleteForm").style.display = "none";
-      }
-
-      function ordenarTabla(campo) {
-        const tbody = document.getElementById("socios-table-body");
-        const filas = Array.from(tbody.querySelectorAll("tr"));
-        const ordenAscendente = tbody.dataset.orden !== campo; // Alterna orden
-
-        // Seleccionar la columna correcta con base en 'campo'
-        let indexColumna = 0; // Default si campo no coincide
-        if (campo === "nombre") {
-          indexColumna = 2; // Columna "Nombre" está en la segunda posición
-        } else if (campo === "apellido") {
-          indexColumna = 3; // Columna "Apellido" está en la tercera posición
-        }
-
-        filas.sort((filaA, filaB) => {
-          const celdaA = filaA.querySelector(`td:nth-child(${indexColumna})`).textContent.trim().toLowerCase();
-          const celdaB = filaB.querySelector(`td:nth-child(${indexColumna})`).textContent.trim().toLowerCase();
-
-          if (celdaA < celdaB) return ordenAscendente ? -1 : 1;
-          if (celdaA > celdaB) return ordenAscendente ? 1 : -1;
-          return 0;
-        });
-
-        // Alternar orden y actualizar el atributo data-orden
-        tbody.dataset.orden = ordenAscendente ? campo : "";
-
-        // Remover y reinsertar filas ordenadas
-        filas.forEach((fila) => tbody.appendChild(fila));
-      }
-
-      function eliminarSocio() {
-        const socioId = document.getElementById("deleteId").value;
-
-        fetch(`/socios/${socioId}/eliminar`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error("Error al eliminar el socio");
-            }
-            return response.text();
-          })
-          .then(() => {
-            document.getElementById(`socio-${socioId}`).remove();
-          })
-          .catch((error) => {
-            console.error("Error:", error);
-            alert("Error al eliminar el socio: " + error.message);
-          })
-          .finally(() => {
-            hideDeleteForm();
-          });
-      }
-    </script>
+    <script src="/static/scripts/botones_read_socios.js"></script>
+    <script src="/static/scripts/indice.js"></script>
   </body>
 </html>

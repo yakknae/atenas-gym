@@ -14,6 +14,14 @@ body {
   overflow-x: hidden;
 }
 
+::selection {
+  background-color: #fc4500; /* Color de fondo al seleccionar */
+  color: #ffffff; /* Color del texto al seleccionar */
+}
+.form-group input ::selection {
+  background-color: #fc4500; /* Color de fondo al seleccionar */
+  color: #ffffff;
+}
 h1 {
   margin: 0;
   font-size: 2.5em;

@@ -10,7 +10,12 @@
   <body>
     <header>
       <h1>ATENAS GYM</h1>
-      <img src="static/assets/atenas2.png" alt="Logo Atenas Gym" class="header-logo" />
+      <img
+        src="static/assets/atenas2.png"
+        alt="Logo Atenas Gym"
+        draggable="false"
+        class="header-logo"
+      />
     </header>
     <main>
       <div class="container">
@@ -19,8 +24,8 @@
           <h2>Socios</h2>
           <p>Gestiona los socios.</p>
           <div class="button-group">
-            <a href="/crear_socio" class="button">Crear socio</a>
-            <a href="/read_socios" class="button">Ver socios</a>
+            <a href="/crear_socio" class="button" draggable="false">Crear socio</a>
+            <a href="/read_socios" class="button" draggable="false">Ver socios</a>
           </div>
         </div>
 
@@ -29,8 +34,8 @@
           <h2>Plan social</h2>
           <p>Gestiona los planes sociales.</p>
           <div class="button-group">
-            <a href="/crear_plan_social" class="button">Crear plan social</a>
-            <a href="/read_planes_sociales" class="button">Ver planes sociales</a>
+            <a href="/crear_plan_social" class="button" draggable="false">Crear plan social</a>
+            <a href="/read_planes_sociales" class="button" draggable="false">Ver planes sociales</a>
           </div>
         </div>
 
@@ -39,8 +44,8 @@
           <h2>Combos de planes</h2>
           <p>Gestiona los combos de planes.</p>
           <div class="button-group">
-            <a href="/crear_plan" class="button">Crear combo</a>
-            <a href="/read_combos" class="button">Ver combos</a>
+            <a href="/crear_plan" class="button" draggable="false">Crear combo</a>
+            <a href="/read_combos" class="button" draggable="false">Ver combos</a>
           </div>
         </div>
 
@@ -49,8 +54,8 @@
           <h2>Asistencias</h2>
           <p>Gestiona las asistencias de los socios.</p>
           <div class="button-group">
-            <a href="/crear_asistencia" class="button">Registrar asistencias</a>
-            <a href="/read_asistencias" class="button">Planilla asistencias</a>
+            <a href="/crear_asistencia" class="button" draggable="false">Registrar asistencias</a>
+            <a href="/read_asistencias" class="button" draggable="false">Planilla asistencias</a>
           </div>
         </div>
 
@@ -59,13 +64,13 @@
           <h2>Cobros - Ingresos</h2>
           <p>Gestiona los pagos de los socios.</p>
           <div class="button-group">
-            <a href="/read_ingresos" class="button">Ver pagos</a>
+            <a href="/read_ingresos" class="button" draggable="false">Ver pagos</a>
           </div>
         </div>
       </div>
       <!-- Botón de Cerrar Sesión -->
       <form class="logout-button" action="/logout" method="get">
-        <a class="logout-tittle" href="/logout">Cerrar sesión</a>
+        <a class="logout-tittle" href="/logout" draggable="false">Cerrar sesión</a>
       </form>
       <!-- BACKGROUND -->
       <div class="background-image"></div>
@@ -73,20 +78,6 @@
     <footer>
       <p>&copy; Atenas gym</p>
     </footer>
-    <script>
-      function logout() {
-        fetch("/logout", {
-          method: "GET",
-        })
-          .then((response) => {
-            if (response.ok) {
-              window.location.href = "/login"; // Redirige al login
-            } else {
-              console.error("Error al cerrar sesión");
-            }
-          })
-          .catch((error) => console.error("Error:", error));
-      }
-    </script>
+    <script src="static/scripts/logout.js"></script>
   </body>
 </html>

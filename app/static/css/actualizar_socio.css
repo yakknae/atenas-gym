@@ -14,7 +14,14 @@ body {
   height: 100vh;
   overflow-x: hidden;
 }
-
+::selection {
+  background-color: #fc4500; /* Color de fondo al seleccionar */
+  color: #ffffff; /* Color del texto al seleccionar */
+}
+.form-group input ::selection {
+  background-color: #fc4500; /* Color de fondo al seleccionar */
+  color: #ffffff;
+}
 /* Estilo del nav */
 nav {
   display: flex;
