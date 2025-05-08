@@ -802,3 +802,73 @@ async def mostrar_actualizar_pago(id_pago: int, request: Request, db: Session = 
             status_code=500,
             content={"message": "Error al mostrar el formulario de actualización"}
         )
+    
+
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+@router.get("/alta_ingresos", response_class=HTMLResponse, tags=["Pagos"])
+async def mostrar_formulario_alta_pago(
+    request: Request,
+    nombre_socio: str = None,
+    db: Session = Depends(get_db)
+):
+    # Si no se proporciona un nombre de socio, solo muestra el formulario inicial
+    if not nombre_socio:
+        return templates.TemplateResponse("alta_ingresos.html", {"request": request})
+
+    # Buscar al socio por nombre
+    socio = (
+        db.query(models.Socio)
+        .join(models.Plan, models.Socio.id_plan == models.Plan.id_plan)
+        .filter(models.Socio.nombre.ilike(f"%{nombre_socio}%"))
+        .first()
+    )
+
+    # Si no se encuentra un socio, muestra un mensaje de error
+    if not socio:
+        return templates.TemplateResponse(
+            "alta_ingresos.html",
+            {"request": request, "message": "Socio no encontrado"}
+        )
+
+    # Calcular la fecha programada (por ejemplo, el primer día del mes actual)
+    fecha_programada = date.today().replace(day=1)
+
+    # Pasar el socio encontrado al template
+    return templates.TemplateResponse(
+        "alta_ingresos.html",
+        {
+            "request": request,
+            "socio": socio,
+            "fecha_programada": fecha_programada.strftime("%Y-%m-%d"),
+        }
+    )
+
+#//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+@router.post("/registrar_pago", tags=["Pagos"])
+async def registrar_pago(
+    id_socio: int = Form(...),
+    fecha_programada: str = Form(...),
+    fecha_pago: str = Form(...),
+    estado_pago: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    try:
+        # Crear un nuevo registro de pago
+        nuevo_pago = models.Pago(
+            id_socio=id_socio,
+            id_plan=db.query(models.Socio.id_plan).filter(models.Socio.id_socio == id_socio).scalar(),
+            fecha_programada=fecha_programada,
+            fecha_pago=fecha_pago if estado_pago == "Pagado" else None,
+            estado_pago=estado_pago,
+            mes_correspondiente=date.fromisoformat(fecha_programada),
+        )
+        db.add(nuevo_pago)
+        db.commit()
+
+        return RedirectResponse(url="/read_ingresos", status_code=303)
+    except Exception as e:
+        print(f"Error al registrar pago: {e}")
+        return JSONResponse(
+            status_code=500,
+            content={"message": "Error al registrar el pago"}
+        )

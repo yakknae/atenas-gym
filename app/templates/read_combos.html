@@ -25,6 +25,7 @@
     <table>
       <thead>
         <tr>
+          <th>#</th>
           <th>ID</th>
           <th>Nombre del Combo</th>
           <th>Días</th>
@@ -33,9 +34,10 @@
           <th>Acciones</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="combos-table-body">
         {% for combo in combos %}
         <tr id="combo-{{ combo.id_plan }}">
+          <td class="indice"></td>
           <td>{{ combo.id_plan }}</td>
           <td>{{ combo.nombre_plan }}</td>
           <td>{{ combo.dias }}</td>
@@ -63,5 +65,6 @@
     </div>
 
     <script src="/static/scripts/botones_read_combos.js"></script>
+    <script src="/static/scripts/indice.js"></script>
   </body>
 </html>

@@ -115,17 +115,18 @@ header h1 {
   background-color: #9e2d04;
 }
 
+/* Ajusta el color de fondo según tu diseño */
+/*
 footer {
-  /* Ajusta el color de fondo según tu diseño */
   color: white;
   text-align: center;
   font-size: 0.9rem;
-  width: 100%; /* Para asegurarte de que el footer ocupe todo el ancho de la pantalla */
+  width: 100%; 
   position: fixed;
-  bottom: 0; /* Pega el footer a la parte inferior */
+  bottom: 0;
   left: 0;
 }
-
+*/
 .background-image {
   position: absolute;
   top: 0;

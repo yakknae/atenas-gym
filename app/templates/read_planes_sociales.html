@@ -25,14 +25,16 @@
     <table>
       <thead>
         <tr>
+          <th>#</th>
           <th>ID</th>
           <th>Nombre del Plan Social</th>
           <th>Acciones</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="planes-table-body">
         {% for plan_social in planes_sociales %}
         <tr id="plan-social-{{ plan_social.id }}">
+          <td class="indice"></td>
           <td>{{ plan_social.id_plan_social }}</td>
           <td>{{ plan_social.nombre_plan_social }}</td>
           <td>
@@ -57,5 +59,6 @@
     </div>
 
     <script src="static/scripts/botones_read_plan_social.js"></script>
+    <script src="/static/scripts/indice.js"></script>
   </body>
 </html>

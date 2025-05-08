@@ -7,6 +7,21 @@
     <link rel="stylesheet" href="/static/css/planilla.css" />
   </head>
   <body>
+    <style>
+      .message-container {
+        margin: 10px 0;
+        padding: 10px;
+        border-radius: 5px;
+      }
+      .pagado {
+        color: green;
+        font-weight: bold;
+      }
+      .pendiente {
+        color: red;
+        font-weight: bold;
+      }
+    </style>
     <div>
       <nav>
         <ul>
@@ -25,12 +40,13 @@
     <table>
       <thead>
         <tr>
-          <th></th>
+          <th>#</th>
           <th id="orden-tabla" data-sort="nombre" onclick="ordenarTabla('nombre')">Nombre</th>
           <th id="orden-tabla" data-sort="apellido" onclick="ordenarTabla('apellido')">Apellido</th>
           <th>DNI</th>
           <th>Fec. Nacimiento</th>
           <th>Género</th>
+          <th>Estado</th>
           <th>Email</th>
           <th>Teléfono</th>
           <th>Dirección</th>
@@ -49,6 +65,7 @@
           <td>{{ socio.dni }}</td>
           <td>{{ socio.fecha_nacimiento }}</td>
           <td>{{ socio.genero }}</td>
+          <td>{{socio.estado}}</td>
           <td>{{ socio.email }}</td>
           <td>{{ socio.telefono }}</td>
           <td>{{ socio.direccion }}</td>

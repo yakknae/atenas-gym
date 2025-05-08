@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dar de Alta Pagos</title>
+    <link rel="stylesheet" href="/static/css/crear.css" />
+  </head>
+  <body>
+    <style>
+      nav h1 {
+        margin-right: 230px;
+      }
+      #nombre_socio,
+      #combo,
+      #precio,
+      #fecha_programada,
+      #fecha_pago,
+      #estado_pago {
+        padding: 12px;
+        border: 1px solid #999999;
+        border-radius: 8px;
+        background-color: #2a2a2a;
+        color: #e0e0e0;
+      }
+      #nombre_socio:focus {
+        outline: none;
+        border-color: #fc4500;
+      }
+      /* Ocultar elementos según condiciones */
+      .hidden {
+        display: none;
+      }
+      h2 {
+        text-align: center;
+        margin: 0px;
+      }
+      form {
+        width: 500px;
+        margin: 40px;
+      }
+    </style>
+    <div>
+      <nav>
+        <ul>
+          <li><a href="/index" draggable="false">Inicio</a></li>
+          <li><a href="/read_ingresos" draggable="false">Ver ingresos</a></li>
+        </ul>
+        <h1>Dar de Alta Pagos</h1>
+      </nav>
+    </div>
+
+    <!-- Mensaje de éxito o error -->
+    {% if message %}
+    <div class="message-container">
+      <p class="message">{{ message }}</p>
+    </div>
+    {% endif %}
+
+    <!-- Formulario para registrar pago -->
+    {% if socio %}
+    <div class="form-container">
+      <form method="POST" action="/registrar_pago">
+        <h2>Registrar Pago para {{ socio.nombre }} {{ socio.apellido }}</h2>
+
+        <input type="hidden" name="id_socio" value="{{ socio.id_socio }}" />
+
+        <label for="combo">Combo:</label>
+        <input type="text" id="combo" name="combo" value="{{ socio.plan.nombre_plan }}" readonly />
+
+        <label for="precio">Precio:</label>
+        <input type="text" id="precio" name="precio" value="{{ socio.plan.precio }}" readonly />
+
+        <label for="fecha_programada">Fecha Programada:</label>
+        <input
+          type="date"
+          id="fecha_programada"
+          name="fecha_programada"
+          value="{{ fecha_programada }}"
+          readonly
+        />
+
+        <label for="fecha_pago">Fecha de Pago:</label>
+        <input type="date" id="fecha_pago" name="fecha_pago" required />
+
+        <label for="estado_pago">Estado del Pago:</label>
+        <select id="estado_pago" name="estado_pago" required>
+          <option value="Pagado">Pagado</option>
+          <option value="Pendiente">Pendiente</option>
+        </select>
+
+        <button type="submit">Registrar Pago</button>
+      </form>
+    </div>
+    {% endif %}
+
+    <!-- Formulario para buscar socio -->
+    <div class="form-container {% if socio %}hidden{% endif %}">
+      <form method="GET" action="/alta_ingresos">
+        <label for="nombre_socio">Nombre del Socio:</label>
+        <input
+          type="text"
+          id="nombre_socio"
+          name="nombre_socio"
+          placeholder="Escribe el nombre del socio"
+          required
+        />
+        <button type="submit">Buscar</button>
+      </form>
+    </div>
+    <!-- BACKGROUND -->
+    <div class="background-image"></div>
+  </body>
+</html>
