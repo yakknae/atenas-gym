@@ -45,6 +45,9 @@
           <td>${{ combo.precio }}</td>
           <td>
             <button onclick="showDeleteForm('{{ combo.id_plan }}')">Eliminar</button>
+            <a href="/planes/{{ combo.id_plan }}/actualizar">
+              <button>Actualizar</button>
+            </a>
           </td>
         </tr>
         {% endfor %}

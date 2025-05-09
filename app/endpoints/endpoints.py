@@ -334,7 +334,29 @@ async def read_plan_social(plan_social_id: int, db: Session = Depends(get_db)):
 
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
-# Actualizar un plan social
+# Actualizar un plan social (get))
+@router.get("/planes_sociales/{plan_social_id}/actualizar", response_class=HTMLResponse, tags=["Planes sociales"])
+async def mostrar_formulario_actualizar_plan_social(
+    plan_social_id: int,
+    request: Request,
+    db: Session = Depends(get_db)
+):
+    # Buscar el plan social por ID
+    plan_social = crud.get_plan_social(db, plan_social_id)
+    if not plan_social:
+        return templates.TemplateResponse("actualizar_plan_social.html", {
+            "request": request,
+            "message": "Plan social no encontrado"
+        })
+
+    # Renderizar el formulario con los datos del plan social
+    return templates.TemplateResponse("actualizar_plan_social.html", {
+        "request": request,
+        "plan_social": plan_social
+    })
+
+
+# Actualizar un plan social (post)
 @router.post("/planes_sociales/{plan_social_id}/actualizar", response_class=HTMLResponse, tags=["Planes sociales"])
 async def update_plan_social(
     plan_social_id: int,
@@ -343,18 +365,24 @@ async def update_plan_social(
     db: Session = Depends(get_db)
 ):
     try:
+        # Crear el objeto de actualización
         plan_social_update = schemas.PlanSocialUpdate(nombre_plan_social=nombre_plan_social)
+
+        # Actualizar el plan social en la base de datos
         plan_actualizado = crud.update_plan_social(db, plan_social_id, plan_social_update)
         if not plan_actualizado:
             raise HTTPException(status_code=404, detail="Plan social no encontrado")
+
+        # Mostrar mensaje de éxito
         message = "Plan social actualizado exitosamente."
     except Exception as e:
         message = f"Error al actualizar el plan social: {str(e)}"
 
-    return templates.TemplateResponse("detalle_plan_social.html", {
+    # Redirigir a la lista de planes sociales con un mensaje
+    return templates.TemplateResponse("read_planes_sociales.html", {
         "request": request,
         "message": message,
-        "plan_social": plan_actualizado
+        "planes_sociales": crud.get_all_planes_sociales(db)  # Lista actualizada
     })
 
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
@@ -423,8 +451,29 @@ async def read_plan(plan_id: int, request: Request, db: Session = Depends(get_db
     })
 
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+# Actualizar un combo (get)
+@router.get("/planes/{plan_id}/actualizar", response_class=HTMLResponse, tags=["Combos"])
+async def mostrar_formulario_actualizar_combo(
+    plan_id: int,
+    request: Request,
+    db: Session = Depends(get_db)
+):
+    # Buscar el combo por ID
+    combo = crud.get_plan(db, plan_id)
+    if not combo:
+        return templates.TemplateResponse("Actualizar_combos.html", {
+            "request": request,
+            "message": "Combo no encontrado"
+        })
 
-# Actualizar un combo
+    # Renderizar el formulario con los datos del combo
+    return templates.TemplateResponse("Actualizar_combos.html", {
+        "request": request,
+        "combo": combo
+    })
+
+
+# Actualizar un combo (post)
 @router.post("/planes/{plan_id}/actualizar", response_class=HTMLResponse, tags=["Combos"])
 async def update_plan_endpoint(
     plan_id: int,
@@ -432,23 +481,36 @@ async def update_plan_endpoint(
     nombre_plan: str = Form(...),
     dias: int = Form(...),
     descripcion: str = Form(None),
+    precio: int = Form(...),
     db: Session = Depends(get_db)
 ):
     try:
-        plan_update = schemas.PlanUpdate(nombre_plan=nombre_plan, dias=dias, descripcion=descripcion)
+        # Crear el objeto de actualización
+        plan_update = schemas.PlanUpdate(nombre_plan=nombre_plan, dias=dias, descripcion=descripcion,precio=precio)
+
+        # Actualizar el combo en la base de datos
         plan_actualizado = crud.update_plan(db, plan_id, plan_update)
         if not plan_actualizado:
             raise HTTPException(status_code=404, detail="Plan no encontrado")
-        message = "Plan actualizado exitosamente."
-    except Exception as e:
-        message = f"Error al actualizar el plan: {str(e)}"
 
-    return templates.TemplateResponse("detalle_plan.html", {
+        # Mostrar mensaje de éxito
+        message = "Plan actualizado exitosamente."
+
+    except HTTPException as http_exc:
+        # Manejar errores específicos de HTTP (como 404)
+        message = http_exc.detail
+
+    except Exception as e:
+        # Manejar otros errores generales
+        message = f"Error al actualizar el plan: {str(e)}"
+        plan_actualizado = None  # Asegúrate de que plan_actualizado esté definida
+
+    # Redirigir a la lista de combos con un mensaje
+    return templates.TemplateResponse("read_combos.html", {
         "request": request,
         "message": message,
-        "plan": plan_actualizado
+        "combos": crud.get_all_planes(db)  # Lista actualizada
     })
-
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
 # Eliminar un combo

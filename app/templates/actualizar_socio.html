@@ -76,7 +76,7 @@
                         {% set primer_pago = socio.pagos[0] %}
                         <input type="date" id="fecha_ingreso" name="fecha_ingreso" required value="{{ primer_pago.fecha_programada }}" />
                     {% else %}
-                        <input type="date" id="fecha_ingreso" name="fecha_ingreso" required value="" disabled />
+                        <input type="date" id="fecha_ingreso" name="fecha_ingreso" required value=""  />
                     {% endif %}
                 </div>
                 <div class="form-group">

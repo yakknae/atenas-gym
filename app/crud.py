@@ -121,13 +121,25 @@ def create_plan(db: Session, plan: schemas.PlanCreate):
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
 def update_plan(db: Session, plan_id: int, plan_update: schemas.PlanUpdate):
-    plan_db = db.query(models.Plan).filter(models.Plan.id_plan == plan_id).first()
-    if plan_db:
-        for key, value in plan_update.dict(exclude_unset=True).items():
-            setattr(plan_db, key, value)
-        db.commit()
-        db.refresh(plan_db)
-    return plan_db
+    # Buscar el plan por ID
+    plan = db.query(models.Plan).filter(models.Plan.id_plan == plan_id).first()
+    # si no existe
+    if not plan:
+        print("Combo no encontrado en la base de datos.")
+        return None
+    
+    print(f"Valores actuales del plan: {plan.nombre_plan}, {plan.dias}, {plan.descripcion}, {plan.precio}")
+
+    # Actualizar los campos del plan
+    plan.nombre_plan = plan_update.nombre_plan
+    plan.dias = plan_update.dias
+    plan.descripcion = plan_update.descripcion
+    plan.precio = plan_update.precio
+
+    db.commit()
+    db.refresh(plan)
+
+    return plan
 
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 

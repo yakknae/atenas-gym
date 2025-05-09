@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actualizar Combos</title>
+    <link rel="stylesheet" href="/static/css/crear.css">
+</head>
+<body>
+    <style>
+        .form-group{
+            margin-bottom: 10px;
+        }
+    </style>
+    <div>
+        <nav>
+            <ul>
+                <li><a href="/index" draggable="false">Inicio</a></li>
+                <li><a href="/read_combos" draggable="false">Ver Pagos</a></li>
+            </ul>
+            <h1>Actualizar Combos </h1>
+        </nav>
+    </div>
+
+    {% if combo %}
+    <div class="form-container">
+        <form action="/planes/{{combo.id_plan}}/actualizar" method="post">
+            <!-- ID del pago (oculto) -->
+            <input type="hidden" name="id_combo" value="{{ combo.id_plan }}" />
+
+            <!-- Campos de solo lectura -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="nombre">Nombre:</label>
+                    <input type="text" id="nombre_plan" name="nombre_plan" value="{{ combo.nombre_plan }}" required />
+                </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="dias">Días:</label>
+                    <input type="number" id="dias" name="dias" value="{{combo.dias}}" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="descripcion">Descripción:</label>
+                    <textarea id="descripcion" name="descripcion" placeholder="Detalles sobre el plan">{{ combo.descripcion }}</textarea>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="precio">Precio:</label>
+                    <input type="number" id="precio" name="precio" value="{{combo.precio}}" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <button type="submit">Actualizar Combo</button>
+            </div>
+        </form>
+    </div>
+    {% else %}
+        <p>No se ha encontrado el Combo o el ID es incorrecto.</p>
+    {% endif %}
+
+    <div class="background-image"></div>
+
+    {% if message %}
+    <div class="message-container">
+        <p class="message">{{ message }}</p>
+    </div>
+    {% endif %}
+</body>
+</html>

@@ -39,6 +39,10 @@
           <td>{{ plan_social.nombre_plan_social }}</td>
           <td>
             <button onclick="showDeleteForm('{{ plan_social.id_plan_social }}')">Eliminar</button>
+            <!-- Botón para actualizar -->
+            <a href="/planes_sociales/{{ plan_social.id_plan_social }}/actualizar">
+              <button>Actualizar</button>
+            </a>
           </td>
         </tr>
         {% endfor %}
