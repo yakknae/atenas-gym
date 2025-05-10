@@ -38,6 +38,7 @@ class Socio(Base):
     id_plan = Column(Integer, ForeignKey('planes.id_plan'))
     id_plan_social = Column(Integer, ForeignKey('planes_sociales.id_plan_social'))
     estado = Column(String(20))
+    fecha_ingreso = Column(Date, nullable=False)
     # Relaciones
     plan = relationship("Plan", back_populates="socios")
     plan_social = relationship("PlanSocial", back_populates="socios")

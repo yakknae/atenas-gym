@@ -7,6 +7,14 @@
     <link rel="stylesheet" href="/static/css/crear.css">
 </head>
 <body>
+    <style>
+        .form-group{
+              margin-bottom: 15px;
+        }
+        form{
+            gap: 0px;
+        }
+    </style>
     <div>
         <nav>
             <ul>
@@ -64,6 +72,7 @@
                     <select id="estado_pago" name="estado_pago" required>
                         <option value="Pagado" {% if pago.estado_pago == "Pagado" %}selected{% endif %}>Pagado</option>
                         <option value="Pendiente" {% if pago.estado_pago == "Pendiente" %}selected{% endif %}>Pendiente</option>
+                        <option value="Inactivo" {% if pago.estado_pago == "Inactivo" %}selected{% endif %}>Inactivo</option>
                     </select>
                 </div>
             </div>

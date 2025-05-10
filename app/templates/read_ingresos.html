@@ -53,9 +53,10 @@
           <td>
             <span
               id="estado_pago_{{ cobro.id_pago }}"
-              class="{{ 'pagado' if cobro.estado_pago == 'Pagado' else 'pendiente' }}"
+              class="{% if cobro.estado_pago == 'Pagado' %}pagado{% elif cobro.estado_pago == 'Pendiente' %}pendiente{% else %}inactivo{% endif %}"
             >
-              {{ "Pagado" if cobro.estado_pago == 'Pagado' else "Pendiente" }}
+              {{ "Pagado" if cobro.estado_pago == 'Pagado' else ("Pendiente" if cobro.estado_pago ==
+              'Pendiente' else "Inactivo") }}
             </span>
           </td>
           <td>
@@ -83,6 +84,10 @@
       }
       .pendiente {
         color: red;
+        font-weight: bold;
+      }
+      .inactivo {
+        color: yellow;
         font-weight: bold;
       }
     </style>

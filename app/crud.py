@@ -4,6 +4,7 @@ from datetime import date, timedelta, datetime, time
 import logging
 from fastapi import Request
 from sqlalchemy import or_
+from dateutil.relativedelta import relativedelta
 
 
 
@@ -350,3 +351,18 @@ def get_all_pagos(db: Session):
     return db.query(models.Pago).all()
 
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
+def generar_pagos(db: Session, id_socio: int, id_plan: int, fecha_ingreso: datetime):
+    """
+    Genera 12 meses de pagos a partir de la fecha de ingreso.
+    """
+    for i in range(-12,12):  # Generar 12 meses de pagos
+        fecha_programada = fecha_ingreso.replace(day=1) + relativedelta(months=i)
+        nuevo_pago = models.Pago(
+            id_socio=id_socio,
+            id_plan=id_plan,
+            fecha_programada=fecha_programada,
+            mes_correspondiente=fecha_programada,
+            estado_pago="Pendiente"
+        )
+        db.add(nuevo_pago)
+    db.commit()

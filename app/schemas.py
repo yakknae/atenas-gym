@@ -55,7 +55,7 @@ class SocioBase(BaseModel):
     id_plan: Optional[int] = None
     id_plan_social: Optional[int] = None
     estado: Optional[str] = None
-
+    fecha_ingreso: Optional[date] = None
 # Esquema para crear un nuevo socio
 class SocioCreate(BaseModel):
     nombre: str
@@ -69,6 +69,7 @@ class SocioCreate(BaseModel):
     id_plan: Optional[int] = None
     id_plan_social: Optional[int] = None
     estado: Optional[str] = None
+    fecha_ingreso: Optional[date] = None
 
 # Esquema para actualizar un socio existente
 class SocioUpdate(BaseModel):  # No es necesario heredar de SocioBase si se definen todos los campos como opcionales
@@ -83,6 +84,7 @@ class SocioUpdate(BaseModel):  # No es necesario heredar de SocioBase si se defi
     id_plan: Optional[int] = None
     id_plan_social: Optional[int] = None
     estado: Optional[str] = None
+    fecha_ingreso: Optional[date] = None
 
 class Socio(SocioBase):
     id_socio: int  # Este campo es de solo lectura y debe estar presente en las respuestas

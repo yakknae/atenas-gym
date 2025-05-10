@@ -68,25 +68,20 @@
                     <input type="text" id="direccion" name="direccion" required value="{{ socio.direccion }}" />
                 </div>
             </div>
-<!--quinta fila-->
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="fecha_ingreso">Fecha de ingreso:</label>
-                    {% if socio.pagos %}
-                        {% set primer_pago = socio.pagos[0] %}
-                        <input type="date" id="fecha_ingreso" name="fecha_ingreso" required value="{{ primer_pago.fecha_programada }}" />
-                    {% else %}
-                        <input type="date" id="fecha_ingreso" name="fecha_ingreso" required value=""  />
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    <label for="estado">Estado:</label>
-                    <select id="estado" name="estado" required>
-                        <option value="Activo" {% if socio.estado == 'Activo' %}selected{% endif %}>Activo</option>
-                        <option value="Inactivo" {% if socio.estado == 'Inactivo' %}selected{% endif %}>Inactivo</option>
-                    </select>
-                </div>
-            </div>
+<!-- Quinta fila -->
+<div class="form-row">
+    <div class="form-group">
+        <label for="fecha_ingreso">Fecha de ingreso:</label>
+        <input type="date" id="fecha_ingreso" name="fecha_ingreso" required value="{{ fecha_ingreso }}" />
+    </div>
+    <div class="form-group">
+        <label for="estado">Estado:</label>
+        <select id="estado" name="estado" required>
+            <option value="Activo" {% if socio.estado == 'Activo' %}selected{% endif %}>Activo</option>
+            <option value="Inactivo" {% if socio.estado == 'Inactivo' %}selected{% endif %}>Inactivo</option>
+        </select>
+    </div>
+</div>
 <!--sexta fila-->
             <div class="form-row">
                 <div class="form-group">

@@ -82,10 +82,9 @@
           </td>
           <td>
             <button onclick="showDeleteForm('{{ socio.id_socio }}')">Eliminar</button>
-            <form action="/actualizar_socio" method="post" style="display: inline">
-              <input type="hidden" name="socio_id" value="{{ socio.id_socio }}" />
-              <button type="submit">Actualizar</button>
-            </form>
+            <a href="/actualizar_socio/{{ socio.id_socio }}">
+              <button>Actualizar</button>
+            </a>
           </td>
         </tr>
         {% endfor %}

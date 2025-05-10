@@ -300,3 +300,7 @@ input[type="month" i] {
   padding: 5px;
   margin: 0px 10px 0px 10px;
 }
+input[type="month" i]::selection {
+  background-color: #fc4500;
+  color: #ffffff;
+}

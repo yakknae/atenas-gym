@@ -61,10 +61,10 @@ async def create_socio(
     email: str = Form(None),
     telefono: str = Form(None),
     direccion: str = Form(None),
-    fecha_programada: str = Form(...),  # Esto es para la fecha de pago
-    id_plan: int = Form(...),  # Asegúrate de que id_plan no sea None
+    id_plan: int = Form(...),  # Plan es obligatorio
     id_plan_social: int = Form(None),
-    estado: str =Form(None),
+    estado: str = Form(None),
+    fecha_ingreso: str = Form(...),  # Fecha de ingreso
     db: Session = Depends(get_db)
 ):
     try:
@@ -90,19 +90,17 @@ async def create_socio(
             email=email,
             telefono=telefono,
             direccion=direccion,
-            id_plan=id_plan,  # Asegurarse de que el plan no sea None
+            id_plan=id_plan,
             id_plan_social=id_plan_social,
-            estado=estado
+            estado=estado,
+            fecha_ingreso=fecha_ingreso
         )
         db_socio = crud.create_socio(db, socio_data)
 
-        # Crear los pagos para el socio, separados por mes
-        fecha_programada_date = datetime.strptime(fecha_programada, '%Y-%m-%d')
-        for mes in range(12): 
-            # Calcular la fecha programada ajustada al mismo día de los meses siguientes
-            fecha_pago = fecha_programada_date + relativedelta(months=mes)
-            
-            # Crear el esquema para el pago
+        # Generar los pagos para el socio
+        fecha_ingreso_date = datetime.strptime(fecha_ingreso, '%Y-%m-%d')
+        for mes in range(-12,12):  # Generar pagos para los próximos 12 meses
+            fecha_pago = fecha_ingreso_date.replace(day=1) + relativedelta(months=mes)
             pago_data = schemas.PagoCreate(
                 id_socio=db_socio.id_socio,
                 id_plan=id_plan,
@@ -112,17 +110,17 @@ async def create_socio(
             crud.create_pago(db, pago_data)
 
         message = "Socio creado exitosamente."
+
     except IntegrityError as e:
         message = f"Error al crear el socio: {str(e)}"
     except ValueError as ve:
         message = str(ve)
     except Exception as e:
         message = f"Error al crear el socio: {str(e)}"
-    
+
     # Redirigir a la misma página después de crear el socio
     url = str(request.url_for("show_create_socio_form"))
     return RedirectResponse(url=f"{url}?message={message}", status_code=303)
-
 
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
@@ -162,33 +160,12 @@ async def mostrar_formulario_actualizacion(request: Request, socio_id: int, db: 
             "message": f"Socio con ID {socio_id} no encontrado.",
         })
 
-    planes = crud.get_all_planes(db)
-    planes_sociales = crud.get_all_planes_sociales(db)
+    # Obtener el primer pago para determinar la fecha de ingreso
+    primer_pago = db.query(models.Pago).filter(
+        models.Pago.id_socio == socio_id
+    ).order_by(models.Pago.fecha_programada.asc()).first()
 
-    return templates.TemplateResponse("actualizar_socio.html", {
-        "request": request,
-        "socio": socio,
-        "planes": planes,
-        "planes_sociales": planes_sociales,
-        "message": None,
-    })
-
-@router.post("/actualizar_socio", response_class=HTMLResponse, tags=["Socios"])
-async def mostrar_formulario_actualizacion(
-    request: Request,
-    socio_id: int = Form(...),  # Recibe el ID del socio
-    db: Session = Depends(get_db),
-):
-    """
-    Muestra el formulario para actualizar los datos del socio.
-    """
-    socio = crud.get_socio(db, socio_id)
-    if not socio:
-        return templates.TemplateResponse("ver_socios.html", {
-            "request": request,
-            "socios": crud.get_all_socios(db),
-            "message": "Socio no encontrado",
-        })
+    fecha_ingreso = primer_pago.fecha_programada if primer_pago else None
 
     planes = crud.get_all_planes(db)
     planes_sociales = crud.get_all_planes_sociales(db)
@@ -198,9 +175,9 @@ async def mostrar_formulario_actualizacion(
         "socio": socio,
         "planes": planes,
         "planes_sociales": planes_sociales,
+        "fecha_ingreso": fecha_ingreso,  # Pasar la fecha de ingreso al formulario
         "message": None,
     })
-
 
 @router.post("/guardar_actualizacion", response_class=HTMLResponse, tags=["Socios"])
 async def guardar_actualizacion(
@@ -213,7 +190,7 @@ async def guardar_actualizacion(
     email: str = Form(...),
     telefono: str = Form(...),
     direccion: str = Form(...),
-    fecha_ingreso: str = Form(...),
+    fecha_ingreso: str = Form(...),  # Fecha de ingreso enviada desde el formulario
     id_plan: int = Form(...),
     id_plan_social: int = Form(...),
     socio_id: int = Form(...),
@@ -221,31 +198,32 @@ async def guardar_actualizacion(
     db: Session = Depends(get_db),
 ):
     """
-    Guarda los cambios realizados en los datos del socio.
+    Guarda los cambios realizados en los datos del socio y actualiza la fecha de ingreso en los pagos.
     """
     socio = crud.get_socio(db, socio_id)
     if not socio:
-        return templates.TemplateResponse("ver_socios.html", {
+        return templates.TemplateResponse("read_socios.html", {
             "request": request,
             "socios": crud.get_all_socios(db),
-            "message": "Socio no encontrado",
+            "message": "Socio no encontrado. Verifica el ID.",
         })
 
-    # Convertir fecha_ingreso a datetime antes de actualizar
+    # Validar fechas
     try:
-        socio.fecha_ingreso = datetime.strptime(fecha_ingreso, "%Y-%m-%d")
+        fecha_ingreso_dt = datetime.strptime(fecha_ingreso, "%Y-%m-%d")
+        fecha_nacimiento_dt = datetime.strptime(fecha_nacimiento, "%Y-%m-%d")
     except ValueError:
-        return templates.TemplateResponse("ver_socios.html", {
+        return templates.TemplateResponse("read_socios.html", {
             "request": request,
             "socios": crud.get_all_socios(db),
-            "message": "Formato de fecha incorrecto",
+            "message": "Formato de fecha incorrecto. Usa el formato YYYY-MM-DD.",
         })
 
     # Actualizar los campos del socio
     socio.nombre = nombre
     socio.apellido = apellido
     socio.dni = dni
-    socio.fecha_nacimiento = fecha_nacimiento
+    socio.fecha_nacimiento = fecha_nacimiento_dt
     socio.genero = genero
     socio.email = email
     socio.telefono = telefono
@@ -254,8 +232,27 @@ async def guardar_actualizacion(
     socio.id_plan_social = id_plan_social
     socio.estado = estado
 
-    db.commit()  # Guardar cambios en la base de datos
-    db.refresh(socio)  # Refrescar los datos del socio
+    # Actualizar la fecha de ingreso en el primer pago (fecha_programada)
+    primer_pago = db.query(models.Pago).filter(
+        models.Pago.id_socio == socio_id
+    ).order_by(models.Pago.fecha_programada.asc()).first()
+
+    if primer_pago:
+        primer_pago.fecha_programada = fecha_ingreso_dt  
+    else:
+        # Si no hay pagos, crear uno nuevo (opcional)
+        nuevo_pago = models.Pago(
+            id_socio=socio_id,
+            id_plan=id_plan,
+            fecha_programada=fecha_ingreso_dt,
+            mes_correspondiente=fecha_ingreso_dt,  
+            estado_pago="Pendiente"
+        )
+        db.add(nuevo_pago)
+
+    # Guardar cambios en la base de datos
+    db.commit()
+    db.refresh(socio)
 
     return templates.TemplateResponse("read_socios.html", {
         "request": request,

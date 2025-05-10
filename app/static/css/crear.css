@@ -56,7 +56,6 @@ form {
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 10px;
 }
 
 .form-group label {
@@ -64,7 +63,8 @@ form {
   color: #e0e0e0;
 }
 
-.form-group input {
+.form-group input,
+#estado_pago {
   padding: 12px;
   border: 1px solid #999999;
   border-radius: 8px;
