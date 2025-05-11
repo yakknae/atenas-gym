@@ -43,3 +43,5 @@ pip-wheel-metadata/
 # Sistema operativo
 .DS_Store
 Thumbs.db
+
+/notas/
