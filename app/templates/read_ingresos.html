@@ -7,6 +7,25 @@
     <link rel="stylesheet" href="/static/css/planilla.css" />
   </head>
   <body>
+    <style>
+      .message-container {
+        margin: 10px 0;
+        padding: 10px;
+        border-radius: 5px;
+      }
+      .pagado {
+        color: green;
+        font-weight: bold;
+      }
+      .pendiente {
+        color: red;
+        font-weight: bold;
+      }
+      .inactivo {
+        color: yellow;
+        font-weight: bold;
+      }
+    </style>
     <div>
       <nav>
         <ul>
@@ -29,7 +48,7 @@
     <table>
       <thead>
         <tr>
-          <th>ID</th>
+          <th>#</th>
           <th>Nombre</th>
           <th>Apellido</th>
           <th>Combo</th>
@@ -40,10 +59,10 @@
           <th>Acción</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="pagos-table-body">
         {% for cobro in cobros %}
         <tr>
-          <td>{{ cobro.id_pago }}</td>
+          <td class="indice"></td>
           <td>{{ cobro.nombre }}</td>
           <td>{{ cobro.apellido }}</td>
           <td>{{ cobro.combo }}</td>
@@ -69,27 +88,7 @@
         {% endfor %}
       </tbody>
     </table>
-
+    <script src="static/scripts/indice.js"></script>
     <script src="static/scripts/read_ingresos.js"></script>
-
-    <style>
-      .message-container {
-        margin: 10px 0;
-        padding: 10px;
-        border-radius: 5px;
-      }
-      .pagado {
-        color: green;
-        font-weight: bold;
-      }
-      .pendiente {
-        color: red;
-        font-weight: bold;
-      }
-      .inactivo {
-        color: yellow;
-        font-weight: bold;
-      }
-    </style>
   </body>
 </html>

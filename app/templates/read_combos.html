@@ -26,7 +26,6 @@
       <thead>
         <tr>
           <th>#</th>
-          <th>ID</th>
           <th>Nombre del Combo</th>
           <th>Días</th>
           <th>Descripción</th>
@@ -38,7 +37,6 @@
         {% for combo in combos %}
         <tr id="combo-{{ combo.id_plan }}">
           <td class="indice"></td>
-          <td>{{ combo.id_plan }}</td>
           <td>{{ combo.nombre_plan }}</td>
           <td>{{ combo.dias }}</td>
           <td>{{ combo.descripcion }}</td>

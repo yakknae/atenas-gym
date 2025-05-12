@@ -52,7 +52,7 @@
       <table id="asistencias-table">
         <thead>
           <tr>
-            <th>ID</th>
+            <th>#</th>
             <th id="orden-tabla-nombre" data-sort="nombre">Nombre</th>
             <th id="orden-tabla-apellido" data-sort="apellido">Apellido</th>
             <th>Fecha</th>
@@ -62,7 +62,7 @@
         <tbody id="asistencias-table-body">
           {% for asistencia in asistencias %}
           <tr id="asistencia-{{ asistencia.socio_id }}">
-            <td>{{ asistencia.socio_id }}</td>
+            <td class="indice"></td>
             <td>{{ asistencia.socio.nombre }}</td>
             <td>{{ asistencia.socio.apellido }}</td>
             <td>{{ asistencia.fecha }}</td>
@@ -80,5 +80,6 @@
     {% endif %}
 
     <script src="static/scripts/read_asistencias.js"></script>
+    <script src="static/scripts/indice.js"></script>
   </body>
 </html>

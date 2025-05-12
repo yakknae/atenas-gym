@@ -64,7 +64,7 @@ async def create_socio(
     id_plan: int = Form(...),  # Plan es obligatorio
     id_plan_social: int = Form(None),
     estado: str = Form(None),
-    fecha_ingreso: str = Form(...),  # Fecha de ingreso
+    fecha_ingreso: str = Form(...),  # Fecha de ingreso (puede ser cualquier día del mes)
     db: Session = Depends(get_db)
 ):
     try:
@@ -93,19 +93,22 @@ async def create_socio(
             id_plan=id_plan,
             id_plan_social=id_plan_social,
             estado=estado,
-            fecha_ingreso=fecha_ingreso
+            fecha_ingreso=fecha_ingreso  # Usamos la fecha ingresada por el usuario
         )
         db_socio = crud.create_socio(db, socio_data)
 
         # Generar los pagos para el socio
         fecha_ingreso_date = datetime.strptime(fecha_ingreso, '%Y-%m-%d')
+        
+        # Variable auxiliar para calcular las fechas de pago
+        fecha_pago_base = fecha_ingreso_date
         for mes in range(-12,12):  # Generar pagos para los próximos 12 meses
-            fecha_pago = fecha_ingreso_date.replace(day=1) + relativedelta(months=mes)
+            fecha_pago = fecha_pago_base  + relativedelta(months=mes)
             pago_data = schemas.PagoCreate(
                 id_socio=db_socio.id_socio,
                 id_plan=id_plan,
-                fecha_programada=fecha_pago.strftime('%Y-%m-%d'),
-                mes_correspondiente=fecha_pago.strftime('%Y-%m-%d')
+                fecha_programada=fecha_pago.strftime('%Y-%m-%d'),  # Fecha programada siempre es el primer día del mes
+                mes_correspondiente=fecha_pago.strftime('%Y-%m-%d')  # Mes correspondiente también es el primer día
             )
             crud.create_pago(db, pago_data)
 
@@ -761,7 +764,7 @@ async def cobros_actuales(mes: str, db: Session = Depends(get_db)):
             "apellido": c[1],
             "combo": c[2],
             "precio": c[3],
-            "fecha_programada": c[4].strftime("%Y-%m-%d"),
+            "fecha_programada": c[4].strftime("%Y-%m-%d").replace(day=1) ,
             "fecha_pago": c[5].strftime("%Y-%m-%d") if c[5] else None,
             "estado_pago": c[6],
         }
@@ -786,10 +789,11 @@ async def procesar_actualizacion_pago(
     id_pago: int = Form(...),
     fecha_pago: str = Form(...),
     estado_pago: str = Form(...),
+    fecha_programada: str = Form(...),  # Nuevo campo para la fecha programada
     db: Session = Depends(get_db)
 ):
     try:
-        # Actualizar el pago en la base de datos
+        # Buscar el pago en la base de datos
         pago = db.query(models.Pago).filter(models.Pago.id_pago == id_pago).first()
 
         if not pago:
@@ -801,6 +805,7 @@ async def procesar_actualizacion_pago(
         # Actualizar campos
         pago.fecha_pago = fecha_pago
         pago.estado_pago = estado_pago
+        pago.fecha_programada = fecha_programada  # Actualizar la fecha programada
         db.commit()
 
         return RedirectResponse(url="/read_ingresos", status_code=303)
