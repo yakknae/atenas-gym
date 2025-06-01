@@ -69,13 +69,7 @@
           <td>{{ socio.email }}</td>
           <td>{{ socio.telefono }}</td>
           <td>{{ socio.direccion }}</td>
-          <td>
-            {% if socio.pagos %} {% set primer_pago = socio.pagos[0] %} {# Asignamos el primer pago
-            al socio #}
-            <div>{{ primer_pago.fecha_programada }}</div>
-            <!-- Solo mostrar la fecha de ingreso del primer pago -->
-            {% else %} Sin pagos registrados {% endif %}
-          </td>
+          <td>{{ socio.fecha_ingreso }}</td>
           <td>{{ socio.plan.nombre_plan if socio.plan else 'Sin Plan' }}</td>
           <td>
             {{ socio.plan_social.nombre_plan_social if socio.plan_social else 'Sin Plan Social' }}

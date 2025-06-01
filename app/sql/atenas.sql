@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS `socios` (
   `id_plan_social` INT NULL,
   `estado` VARCHAR(20) NOT NULL DEFAULT 'Activo',
   `fecha_ingreso` DATE NOT NULL,
+  `fecha_inicio_pagos` DATE NOT NULL,
   PRIMARY KEY (`id_socio`),
   UNIQUE KEY `dni` (`dni`),
   KEY `id_plan` (`id_plan`),

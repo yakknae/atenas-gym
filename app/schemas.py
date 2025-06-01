@@ -19,8 +19,8 @@ class PlanUpdate(PlanBase):
 class Plan(PlanBase):
     id_plan: int
 
-class Config:
-     from_attributes = True
+    class Config:
+        from_attributes = True
 
 #=============================== PLANES S O C I A L E S ================================================
 
@@ -38,8 +38,8 @@ class PlanSocial(PlanSocialBase):
     id_plan_social: int
 
 
-class Config:
-     from_attributes = True
+    class Config:
+        from_attributes = True
 
 #=============================== S O C I O S ================================================
 
@@ -48,6 +48,8 @@ class SocioBase(BaseModel):
     apellido: str
     dni: int
     fecha_nacimiento: Optional[date] = None
+    fecha_ingreso: Optional[date] = None
+    fecha_inicio_pagos: Optional[date] = None
     genero: Optional[str] = None
     email: Optional[EmailStr] = None
     telefono: Optional[str] = None
@@ -55,13 +57,15 @@ class SocioBase(BaseModel):
     id_plan: Optional[int] = None
     id_plan_social: Optional[int] = None
     estado: Optional[str] = None
-    fecha_ingreso: Optional[date] = None
+
 # Esquema para crear un nuevo socio
 class SocioCreate(BaseModel):
     nombre: str
     apellido: str
     dni: int
     fecha_nacimiento: Optional[date] = None
+    fecha_ingreso: Optional[date] = None
+    fecha_inicio_pagos: Optional[date] = None
     genero: Optional[str] = None
     email: Optional[EmailStr] = None
     telefono: Optional[str] = None
@@ -69,14 +73,15 @@ class SocioCreate(BaseModel):
     id_plan: Optional[int] = None
     id_plan_social: Optional[int] = None
     estado: Optional[str] = None
-    fecha_ingreso: Optional[date] = None
 
 # Esquema para actualizar un socio existente
 class SocioUpdate(BaseModel):  # No es necesario heredar de SocioBase si se definen todos los campos como opcionales
     nombre: Optional[str] = None
     apellido: Optional[str] = None
     dni: Optional[int] = None
-    fecha_nacimiento: Optional[date] = None  # Cambiado a `date` para consistencia
+    fecha_nacimiento: Optional[date] = None
+    fecha_ingreso: Optional[date] = None
+    fecha_inicio_pagos: Optional[date] = None
     genero: Optional[str] = None
     email: Optional[EmailStr] = None
     telefono: Optional[str] = None
@@ -84,7 +89,6 @@ class SocioUpdate(BaseModel):  # No es necesario heredar de SocioBase si se defi
     id_plan: Optional[int] = None
     id_plan_social: Optional[int] = None
     estado: Optional[str] = None
-    fecha_ingreso: Optional[date] = None
 
 class Socio(SocioBase):
     id_socio: int  # Este campo es de solo lectura y debe estar presente en las respuestas
@@ -111,8 +115,8 @@ class Asistencia(AsistenciaBase):
     socio: SocioBase
 
 
-class Config:
-     from_attributes = True
+    class Config:
+        from_attributes = True
 
 #=============================== L O G I N ================================================
 # Esquema base para la asistencia
@@ -130,8 +134,8 @@ class Login(LoginBase):
     id: int
 
 
-class Config:
-     from_attributes = True
+    class Config:
+        from_attributes = True
 
 #=============================== P A G O S ================================================
 class PagoBase(BaseModel):
@@ -158,7 +162,7 @@ class Pago(PagoBase):
 #===============================================================================
 class Respuesta(BaseModel):
     success: bool
-    message: str = None
+    message: Optional[str] = None
 
 
 #===============================================================================

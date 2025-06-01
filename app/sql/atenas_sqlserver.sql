@@ -30,7 +30,8 @@ CREATE TABLE socios (
     id_plan INT NULL,
     id_plan_social INT NULL,
     estado NVARCHAR(20) NOT NULL DEFAULT 'Activo', -- Atributo "estado"
-    fecha_ingreso DATE NOT NULL, -- Atributo "fecha_ingreso"
+    fecha_ingreso DATE NOT NULL,
+    fecha_inicio_pagos DATE NOT NULL, -- Atributo "fecha_ingreso"
     CONSTRAINT socios_ibfk_1 FOREIGN KEY (id_plan) REFERENCES planes (id_plan),
     CONSTRAINT socios_ibfk_2 FOREIGN KEY (id_plan_social) REFERENCES planes_sociales (id_plan_social)
 );

@@ -176,15 +176,15 @@ def get_all_asistencias(db: Session, skip: int = 0, limit: int = 100):
 def eliminar_asistencia(db: Session, asistencia_id: int):
     asistencia = db.query(models.Asistencia).filter(models.Asistencia.id == asistencia_id).first()
     if not asistencia:
-        return False
+        return {"status": "error", "message": "Asistencia no encontrada."}
     db.delete(asistencia)
     db.commit()
-    return True
+    return {"status": "success", "message": "Asistencia eliminada exitosamente."}
 
 #=============================== L O G I N ================================================
 # Crear usuario
 def create_login(db: Session, login_data: schemas.LoginCreate):
-    db_login = models.Login(**login_data.dict())  # Crear una instancia del modelo
+    db_login = models.login(**login_data.dict())  # Crear una instancia del modelo
     db.add(db_login)  # Agregar a la sesión
     db.commit()  # Guardar cambios
     db.refresh(db_login)  # Actualizar el objeto con la información de la base de datos
@@ -246,13 +246,6 @@ def update_asistencia(db: Session, asistencia_id: int, socio_id: int):
 
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
-def get_asistencias_by_socio(db: Session, socio: str):
-    try:
-        result = db.query(models.Asistencia).join(models.Socio).filter(models.Socio.nombre.like(f'%{socio}%')).all()
-        return result
-    except Exception as e:
-        print(f"Error al ejecutar la consulta: {e}")
-        return []
     
 #//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//
 
@@ -339,9 +332,17 @@ def actualizar_cobro(db: Session, id_pago: int, fecha_pago: str):
     pago = get_pago(db, id_pago)
     if not pago:
         return None
-    pago.fecha_pago = fecha_pago
+
+    try:
+        fecha_pago_dt = datetime.strptime(fecha_pago, "%Y-%m-%d").date()
+    except ValueError:
+        raise ValueError("Formato de fecha inválido. Usa YYYY-MM-DD")
+
+    pago.fecha_pago = fecha_pago_dt
     pago.estado_pago = "Pagado"
+
     db.commit()
+    db.refresh(pago)
     return pago
 
 

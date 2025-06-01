@@ -31,6 +31,8 @@ class Socio(Base):
     apellido = Column(String(100), nullable=False)
     dni = Column(Integer, unique=True, nullable=False)
     fecha_nacimiento = Column(Date)
+    fecha_ingreso = Column(Date, nullable=False)
+    fecha_inicio_pagos = Column(Date)
     genero = Column(String(50))
     email = Column(String(150))
     telefono = Column(String(20))
@@ -38,7 +40,6 @@ class Socio(Base):
     id_plan = Column(Integer, ForeignKey('planes.id_plan'))
     id_plan_social = Column(Integer, ForeignKey('planes_sociales.id_plan_social'))
     estado = Column(String(20))
-    fecha_ingreso = Column(Date, nullable=False)
     # Relaciones
     plan = relationship("Plan", back_populates="socios")
     plan_social = relationship("PlanSocial", back_populates="socios")

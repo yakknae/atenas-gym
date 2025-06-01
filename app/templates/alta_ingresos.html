@@ -97,14 +97,13 @@
     <!-- Formulario para buscar socio -->
     <div class="form-container {% if socio %}hidden{% endif %}">
       <form method="GET" action="/alta_ingresos">
-        <label for="nombre_socio">Nombre del Socio:</label>
-        <input
-          type="text"
-          id="nombre_socio"
-          name="nombre_socio"
-          placeholder="Escribe el nombre del socio"
-          required
-        />
+        <label for="socio">Seleccione un socio:</label>
+        <select id="socio" name="id_socio" required>
+          <option value="" disabled selected>Seleccionar socio</option>
+          {% for socio in socios %}
+          <option value="{{ socio.id_socio }}">{{ socio.nombre }} {{ socio.apellido }}</option>
+          {% endfor %}
+        </select>
         <button type="submit">Buscar</button>
       </form>
     </div>

@@ -61,7 +61,7 @@
       </thead>
       <tbody id="pagos-table-body">
         {% for cobro in cobros %}
-        <tr>
+        <tr id="pago-{{ cobro.id_pago }}">
           <td class="indice"></td>
           <td>{{ cobro.nombre }}</td>
           <td>{{ cobro.apellido }}</td>
@@ -79,6 +79,7 @@
             </span>
           </td>
           <td>
+            <button onclick="showDeleteForm('{{ cobro.id_pago }}')">Eliminar</button>
             <a href="/actualizar_pago/{{ cobro.id_pago }}">
               <button>Actualizar</button>
             </a>
@@ -88,7 +89,21 @@
         {% endfor %}
       </tbody>
     </table>
+
+    <!-- Formulario de eliminación -->
+    <div id="deleteForm" style="display: none">
+      <h2>Eliminar Pago</h2>
+      <form id="eliminarPago" method="post">
+        <input type="hidden" id="deleteId" name="id" />
+        <p class="parrafo">¿Estás seguro de que deseas eliminar este pago?</p>
+        <div class="botones-act-dele1">
+          <button type="button" onclick="eliminarPago()">Eliminar</button>
+          <button class="pis" type="button" onclick="hideDeleteForm()">Cancelar</button>
+        </div>
+      </form>
+    </div>
     <script src="static/scripts/indice.js"></script>
     <script src="static/scripts/read_ingresos.js"></script>
+    <script src="static/scripts/botones_read_pagos.js"></script>
   </body>
 </html>

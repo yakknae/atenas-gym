@@ -38,3 +38,32 @@ INSERT INTO [socios] (
 ('Sofía', 'Hernández', 67890123, '1987-04-30', 'Mujer', 'sofia@example.com', '666777888', 'Calle Este 123', 1, 1, 'Activo', '2023-01-01'),
 ('Javier', 'Díaz', 78901234, '1993-12-14', 'Hombre', 'javier@example.com', '888999000', 'Avenida Oeste 654', 2, 1, 'Activo', '2023-01-01'),
 ('Valentina', 'Ruiz', 89012345, '1989-06-22', 'Mujer', 'valentina@example.com', '222333444', 'Calle Centro 789', 2, 1, 'Activo', '2023-01-01');
+
+
+INSERT INTO planes_sociales (nombre_plan_social) VALUES
+('PREMEDIC'),
+('DIVA'),
+('PFA'),
+('IOMA'),
+('OSDE'),
+('OSPOSE'),
+('swiss medical'),
+('pami'),
+('DIBA'),
+('SANCOR'),
+('LUIS PASTEUR'),
+('UNION PERSONAL'),
+('osecac'),
+('HOSPITAL ITALIANO'),
+('N/S'),
+('CEMIC'),
+('Plan Social A'),
+('Plan Social B');
+
+INSERT INTO planes (nombre_plan, precio, dias, descripcion) VALUES
+('LIBRE', 22000, 5, NULL),
+('COBRE', 21000, 2, 'PLAN EQUIVALENTE A 8 SESIONES X MES CON PLANIFICACION'),
+('PLATA', 24000, 3, 'PLAN EQUIVALENTE A 12 SESIONES AL MES CON PLANIFICACION'),
+('ORO', 27500, 5, 'PLAN LIBRE DE DIAS CON PLANIFICACION'),
+('Plan Básico', 100, 30, 'Acceso básico al gimnasio'),
+('Plan Premium', 200, 30, 'Acceso completo al gimnasio');
